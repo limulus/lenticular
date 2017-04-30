@@ -1,0 +1,2 @@
+# lenticular
+Opinionated CloudFormation deployer

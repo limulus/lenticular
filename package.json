@@ -18,5 +18,11 @@
   "bugs": {
     "url": "https://github.com/limulus/lenticular/issues"
   },
-  "homepage": "https://github.com/limulus/lenticular#readme"
+  "homepage": "https://github.com/limulus/lenticular#readme",
+  "dependencies": {
+    "aws-sdk": "^2.48.0",
+    "js-yaml": "^3.8.3",
+    "rc": "^1.2.1",
+    "yazl": "^2.4.2"
+  }
 }

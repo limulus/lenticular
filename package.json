@@ -1,0 +1,22 @@
+{
+  "name": "@limulus/lenticular",
+  "version": "0.0.0",
+  "description": "Opinionated CloudFormation deployer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/limulus/lenticular.git"
+  },
+  "keywords": [
+    "cloudformation"
+  ],
+  "author": "Eric McCarthy <eric@limulus.net> (https://limulus.net/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/limulus/lenticular/issues"
+  },
+  "homepage": "https://github.com/limulus/lenticular#readme"
+}

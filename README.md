@@ -36,6 +36,36 @@ It should look like this:
 ```
 
 Now you can run `lenticular init`, and this will create a new CloudFormation
-stack in ever region in the config file. This stack will have an S3 bucket
+stack in every region in the config file. This stack will have an S3 bucket
 for artifacts like ZIP files for Lambda function code, in each region. Rerun
 this command if you add more regions to the config file.
+
+## Writing CloudFormation Templates
+
+I like to put my main CloudFormation template in `/infra/index.yaml`. You can
+override this with the `indexTemplate` configuration property.
+
+By default CloudFormation gives your resources random names that are useless.
+Lenticular gives you two functions to help with giving your resources
+meaningful, short-as-possible, and non-colliding names. For example,
+in the following template, your lambda function would get a `FunctionName`
+value of `projectx-ProcessUpload`:
+
+```yaml
+Resources:
+  ProcessUploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Lenticular::ResourceName 'ProcessUpload'
+```
+
+Or the following for an S3 bucket or other resources in a global namespace,
+to generate a value of `projectx-UserData-us-west-2`:
+
+```yaml
+Resources:
+  UserDataBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Lenticular::ResourceNameWithRegion 'UserData'
+```

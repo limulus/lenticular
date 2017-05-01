@@ -1,7 +1,7 @@
 {
   "name": "@limulus/lenticular",
   "version": "0.0.0",
-  "description": "Opinionated CloudFormation deployer",
+  "description": "A particular CloudFormation deployer",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

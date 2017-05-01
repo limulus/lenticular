@@ -1,6 +1,6 @@
 # lenticular
 
-Opinionated CloudFormation deployer
+A particular CloudFormation deployer.
 
 ## What is this thing?
 

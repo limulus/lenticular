@@ -1,5 +1,5 @@
 {
-  "name": "@limulus/lenticular",
+  "name": "lenticular",
   "version": "0.0.0",
   "description": "A particular CloudFormation deployer",
   "main": "index.js",

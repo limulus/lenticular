@@ -2,9 +2,12 @@
   "name": "lenticular",
   "version": "0.0.0",
   "description": "A particular CloudFormation deployer",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "bin": "dist/bin/cli.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel -s inline -D src -d dist",
+    "preversion": "npm run build && npm test",
+    "test": "mocha --compilers js:babel-register"
   },
   "repository": {
     "type": "git",
@@ -23,6 +26,7 @@
     "aws-sdk": "^2.48.0",
     "js-yaml": "^3.8.3",
     "rc": "^1.2.1",
+    "yargs": "^7.1.0",
     "yazl": "^2.4.2"
   },
   "devDependencies": {

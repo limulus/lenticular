@@ -24,6 +24,7 @@
   "homepage": "https://github.com/limulus/lenticular#readme",
   "dependencies": {
     "aws-sdk": "^2.48.0",
+    "cloudformation-js-yaml-schema": "^0.3.1",
     "js-yaml": "^3.8.3",
     "rc": "^1.2.1",
     "yargs": "^7.1.0",

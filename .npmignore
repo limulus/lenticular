@@ -35,3 +35,8 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# Tests and source code not needed in npm module
+test
+fixtures
+src

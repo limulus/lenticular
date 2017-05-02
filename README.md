@@ -24,21 +24,14 @@ It should look like this:
 ```json
 {
   "productName": "projectx",
-  "stages": {
-    "prod": {
-      "regions": ["us-east-1", "eu-central-1"]
-    },
-    "devel": {
-      "regions": ["us-west-2"]
-    }
-  }
+  "productionRegions": ["us-east-1", "eu-central-1"]
 }
 ```
 
 Now you can run `lenticular init`, and this will create a new CloudFormation
 stack in every region in the config file. This stack will have an S3 bucket
-for artifacts like ZIP files for Lambda function code, in each region. Rerun
-this command if you add more regions to the config file.
+for artifacts like ZIP files for Lambda function code, in each production
+region. Rerun this command if you add more regions to the config file.
 
 ## Writing CloudFormation Templates
 

@@ -1,14 +1,78 @@
 import yaml from 'js-yaml'
-import {CLOUDFORMATION_SCHEMA} from 'cloudformation-js-yaml-schema'
+import {
+  CLOUDFORMATION_SCHEMA,
+  cloudformationTags as CFTags
+} from 'cloudformation-js-yaml-schema'
+
 
 export default class YamlDocument {
   constructor (documentString) {
-    this.data = yaml.safeLoad(documentString, {
-      schema: CLOUDFORMATION_SCHEMA
-    })
+    this.data = yaml.safeLoad(documentString, {schema: LENTICULAR_SCHEMA})
   }
 
-  transformYaml () {
-    return yaml.safeDump(this.data, {schema: CLOUDFORMATION_SCHEMA})
+  toCloudFormationYamlString () {
+    const yamlData = yamlDataToCloudFormationYamlData(this.data)
+    return yamlDataToString(yamlData, CLOUDFORMATION_SCHEMA)
+  }
+
+  toYamlString (schema = LENTICULAR_SCHEMA) {
+    return yamlDataToString(this.data, LENTICULAR_SCHEMA)
   }
 }
+
+
+function yamlDataToString (data, schema) {
+  return yaml.safeDump(data, {schema})
+}
+
+
+function yamlDataToCloudFormationYamlData (data) {
+  if (data.constructor === Object) {
+    const copy = {}
+    Object.keys(data).forEach(key => {
+      copy[key] = yamlDataToCloudFormationYamlData(data[key])
+    })
+    return copy
+  }
+  else if (Array.isArray(data)) {
+    return data.map(val => yamlDataToCloudFormationYamlData(val))
+  }
+  else if (data instanceof ResourceName) {
+    return data.toCloudFormationYaml()
+  }
+  else {
+    return data
+  }
+}
+
+
+class ResourceName {
+  constructor (name) { this.name = name }
+
+  toCloudFormationYaml () {
+    return new (cfClasses.get('!Join:sequence'))(['-', [
+      new (cfClasses.get('!Ref:scalar'))('AWS::StackName'), this.name
+    ]])
+  }
+}
+
+class ResourceNameWithRegion extends ResourceName {
+  // …
+}
+
+
+const ResourceNameYamlType = new yaml.Type('!Lenticular::ResourceName', {
+  kind: 'scalar',
+  instanceOf: ResourceName,
+  construct: data => new ResourceName(data),
+  represent: (ref, style) => ref.name
+})
+
+
+const cfClasses = new Map(
+  CFTags.map(tag => [`${tag.tag}:${tag.kind}`, tag.construct])
+)
+
+const LENTICULAR_SCHEMA = yaml.Schema.create(CFTags.concat([
+  ResourceNameYamlType,
+]))

@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Stack Template
+Parameters:
+  Stage:
+    Type: String
+  ReleaseVersion:
+    Type: String
+Resources:
+  UserDataBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !<!Join>
+        - '-'
+        - - !<!Ref> 'AWS::StackName'
+          - UserData
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            NoncurrentVersionExpirationInDays: 15

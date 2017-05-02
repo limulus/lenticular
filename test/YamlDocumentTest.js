@@ -28,17 +28,27 @@ describe(`YamlDocument`, () => {
     })
   })
 
-  describe(`transformYaml()`, () => {
+  describe(`toYamlString()`, () => {
     it(`should return functionally equivalent YAML`, () => {
       doc = new YamlDocument(`Hello: 'World'`)
-      assert.strictEqual(doc.transformYaml().trim(), `Hello: World`)
+      assert.strictEqual(doc.toYamlString().trim(), `Hello: World`)
     })
 
     it(`should return functionally equivalent CloudFormation YAML`, () => {
       doc = new YamlDocument(fixture(`standard-cf.yaml`))
       assert.strictEqual(
-        doc.transformYaml().trim().replace(/\s+\r?\n/g, '\n'),
+        doc.toYamlString().trim().replace(/\s+\r?\n/g, '\n'),
         fixture(`standard-cf-afterParse.yaml`).trim()
+      )
+    })
+  })
+
+  describe(`toCloudFormationYamlString()`, () => {
+    it(`should handle !Lenticular::ResourceName translation correctly`, () => {
+      doc = new YamlDocument(fixture(`lenticular-cf.yaml`))
+      assert.strictEqual(
+        doc.toCloudFormationYamlString().trim().replace(/\s+\r?\n/g, '\n'),
+        fixture(`lenticular-cf-afterTransform.yaml`).trim()
       )
     })
   })

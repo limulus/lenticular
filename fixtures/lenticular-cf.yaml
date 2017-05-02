@@ -10,10 +10,15 @@ Parameters:
 
 Resources:
 
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Lenticular::ResourceName 'HelloWorld'
+
   UserDataBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Lenticular::ResourceName 'UserData'
+      BucketName: !Lenticular::ResourceNameWithRegion 'UserData'
       VersioningConfiguration:
         Status: Enabled
       LifecycleConfiguration:

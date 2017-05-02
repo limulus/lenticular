@@ -44,7 +44,7 @@ describe(`YamlDocument`, () => {
   })
 
   describe(`toCloudFormationYamlString()`, () => {
-    it(`should handle !Lenticular::ResourceName translation correctly`, () => {
+    it(`should handle Lenticular function translations correctly`, () => {
       doc = new YamlDocument(fixture(`lenticular-cf.yaml`))
       assert.strictEqual(
         doc.toCloudFormationYamlString().trim().replace(/\s+\r?\n/g, '\n'),

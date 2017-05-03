@@ -1,0 +1,4 @@
+{
+  "productName": "${productName}",
+  "buildRegion": "${buildRegion}"
+}

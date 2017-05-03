@@ -7,7 +7,8 @@
   "scripts": {
     "build": "babel -s inline -D src -d dist",
     "preversion": "npm run build && npm test",
-    "test": "mocha --compilers js:babel-register"
+    "test": "mocha --compilers js:babel-register",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",

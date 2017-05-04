@@ -6,12 +6,6 @@ export default class InitFileWriter {
   constructor (config) {
     this.config = config
     this.initTemplatesDir = resolvePath(__dirname, '..', '..', 'init-templates')
-    this.templates = {
-      lenticularrc: {
-        src:  resolvePath(this.initTemplatesDir, 'lenticularrc.json'),
-        dest: resolvePath(this.config.projectDir, '.lenticularrc')
-      }
-    }
   }
 
   writeAll () {
@@ -21,12 +15,18 @@ export default class InitFileWriter {
   }
 
   writeRC () {
+    return this.applyConfigToTemplateAndWrite(
+      resolvePath(this.initTemplatesDir, 'lenticularrc.json'),
+      resolvePath(this.config.projectDir, '.lenticularrc')
+    )
+  }
+
+  applyConfigToTemplateAndWrite (templatePath, outfilePath) {
     return new Promise((resolve, reject) => {
-      const rcTemplatePath = resolvePath(this.initTemplatesDir, 'lenticularrc.json')
-      readFile(rcTemplatePath, 'utf-8', (err, jsonTemplate) => {
+      readFile(templatePath, 'utf-8', (err, templateString) => {
         if (err) return reject(err)
-        const json = template(jsonTemplate, this.config)
-        writeFile(resolvePath(this.config.projectDir, '.lenticularrc'), json, (err) => {
+        const outData = template(templateString, this.config)
+        writeFile(outfilePath, outData, (err) => {
           if (err) return reject(err)
           return resolve()
         })

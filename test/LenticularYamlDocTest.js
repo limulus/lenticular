@@ -10,6 +10,7 @@ function fixture (fileName) {
 }
 
 describe(`LenticularYamlDoc`, () => {
+  const config = { productName: 'projectx' }
   let doc
 
   describe(`constructor()`, () => {
@@ -45,10 +46,9 @@ describe(`LenticularYamlDoc`, () => {
 
   describe(`toCloudFormationYamlString()`, () => {
     it(`should handle Lenticular function translations correctly`, () => {
-      doc = new LenticularYamlDoc(fixture(`lenticular-cf.yaml`))
-      const config = { productName: 'projectx' }
+      doc = new LenticularYamlDoc(fixture(`lenticular-cf.yaml`), config)
       assert.strictEqual(
-        doc.toCloudFormationYamlString(config).trim().replace(/\s+\r?\n/g, '\n'),
+        doc.toCloudFormationYamlString().trim().replace(/\s+\r?\n/g, '\n'),
         fixture(`lenticular-cf-afterTransform.yaml`).trim()
       )
     })

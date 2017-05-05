@@ -6,12 +6,13 @@ import {
 
 
 export default class LenticularYamlDoc {
-  constructor (documentString) {
+  constructor (documentString, config={}) {
     this.data = yaml.safeLoad(documentString, {schema: LENTICULAR_SCHEMA})
+    this.config = config
   }
 
-  toCloudFormationYamlString (config) {
-    const yamlData = yamlDataToCloudFormationYamlData(this.data, config)
+  toCloudFormationYamlString () {
+    const yamlData = yamlDataToCloudFormationYamlData(this.data, this.config)
     return yamlDataToString(yamlData, CLOUDFORMATION_SCHEMA)
   }
 

@@ -103,6 +103,6 @@ const cfClasses = new Map(
   CFTags.map(tag => [`${tag.tag}:${tag.kind}`, tag.construct])
 )
 
-const LENTICULAR_SCHEMA = yaml.Schema.create(CFTags.concat([
+export const LENTICULAR_SCHEMA = yaml.Schema.create(CFTags.concat([
   ResourceNameYamlType, ResourceNameWithRegionYamlType, ProductNameYamlType
 ]))

@@ -1,7 +1,7 @@
 {
   "name": "lenticular",
   "version": "0.0.0",
-  "description": "A particular CloudFormation deployer",
+  "description": "A particular CloudFormation helper",
   "main": "dist/index.js",
   "bin": "dist/bin/cli-shim.js",
   "engines": {

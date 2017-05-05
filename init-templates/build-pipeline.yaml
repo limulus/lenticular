@@ -1,0 +1,154 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: !Join [' ' [ !Lenticular::ProductName 'Build Pipeline' ] ]
+
+
+# -------------------------------------------------------------------
+# Template Parameters
+# -------------------------------------------------------------------
+
+Parameters:
+  GithubOauthToken:
+    Type: String
+  GithubRepoOwner:
+    Type: String
+  GithubRepoName:
+    Type: String
+  GithubRepoBranch:
+    Type: String
+    Default: master
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: GitHub Integration
+        Parameters:
+          - GithubRepoOwner
+          - GithubRepoName
+          - GithubRepoBranch
+          - GithubOauthToken
+
+
+Resources:
+
+# -------------------------------------------------------------------
+# Resources: CodePipeline for
+# -------------------------------------------------------------------
+
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: !GetAtt PipelineRole.Arn
+      Name: !Lenticular::ResourceName Pipeline
+      ArtifactStore:
+        Location: !Ref ArtifactBucket
+        Type: S3
+      Stages:
+
+        - Name: FetchSourceCode
+          Actions:
+            - Name: FetchSourceCode
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              Configuration:
+                Owner: !Ref GithubRepoOwner
+                Repo: !Ref GithubRepoName
+                Branch: !Ref GithubRepoBranch
+                OAuthToken: !Ref GithubOauthToken
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: SourceCode
+              RunOrder: 1
+
+        - Name: DeployProduct
+          Actions:
+          - Name: AttemptCloudFormationChange
+            ActionTypeId:
+              Category: Build
+              Owner: AWS
+              Version: 1
+              Provider: CodeBuild
+            InputArtifacts:
+              - SourceCode
+            OutputArtifacts:
+              - Name: ProductArtifacts
+            Configuration:
+              ProjectName: !Ref ArtifactBuilder
+            RunOrder: 1
+
+  ArtifactBuilder:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/nodejs:6.3.1
+        EnvironmentVariables:
+          - Name: ARTIFACT_BUCKET
+            Value: !Ref ArtifactBucket
+      Name: !Lenticular::ResourceName ArtifactBuilder
+      ServiceRole: !Ref ArtifactBuilderRole
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: |
+          version: 0.1
+          phases:
+            install:
+              commands:
+                - npm install
+            build:
+              commands:
+                - ./node_modules/.bin/lenticular build
+            post_build:
+              commands:
+                - aws s3 sync build/ s3://$ARTIFACT_BUCKET/
+
+
+# -------------------------------------------------------------------
+# Resources: S3 Bucket for Artifacts
+# -------------------------------------------------------------------
+
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Lenticular::ResourceNameWithRegion artifacts
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: BucketOwnerFullControl
+
+
+# -------------------------------------------------------------------
+# Resources: IAM Roles
+# -------------------------------------------------------------------
+
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: codepipeline.amazonaws.com
+          Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  ArtifactBuilderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess

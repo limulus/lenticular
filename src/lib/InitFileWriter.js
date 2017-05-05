@@ -1,6 +1,7 @@
 import {readFile, writeFile} from 'fs'
-import {resolve as resolvePath} from 'path'
+import {resolve as resolvePath, parse as parsePath} from 'path'
 import template from 'backtick-template'
+import mkdirp from 'mkdirp'
 
 export default class InitFileWriter {
   constructor (config) {
@@ -10,7 +11,8 @@ export default class InitFileWriter {
 
   writeAll () {
     return Promise.all([
-      this.writeRC()
+      this.writeRC(),
+      this.writeBuildPipelineYaml(),
     ])
   }
 
@@ -21,14 +23,24 @@ export default class InitFileWriter {
     )
   }
 
+  writeBuildPipelineYaml () {
+    return this.applyConfigToTemplateAndWrite(
+      resolvePath(this.initTemplatesDir, 'build-pipeline.yaml'),
+      resolvePath(this.config.projectDir, 'infra', 'build-pipeline.yaml')
+    )
+  }
+
   applyConfigToTemplateAndWrite (templatePath, outfilePath) {
     return new Promise((resolve, reject) => {
       readFile(templatePath, 'utf-8', (err, templateString) => {
         if (err) return reject(err)
-        const outData = template(templateString, this.config)
-        writeFile(outfilePath, outData, (err) => {
+        mkdirp(parsePath(outfilePath).dir, err => {
           if (err) return reject(err)
-          return resolve()
+          const outData = template(templateString, this.config)
+          writeFile(outfilePath, outData, (err) => {
+            if (err) return reject(err)
+            return resolve()
+          })
         })
       })
     })

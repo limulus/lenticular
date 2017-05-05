@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {tmpdir} from 'os'
-import {mkdtemp, readFileSync} from 'fs'
+import {mkdtemp, readFileSync, statSync} from 'fs'
 import {resolve} from 'path'
 import rimraf from 'rimraf'
 
@@ -33,6 +33,12 @@ describe(`InitFileWriter`, () => {
         "productName": 'tycho',
         "buildRegion": 'us-east-2'
       })
+    })
+
+    it(`should write the infra/build-pipeline.yaml file`, async () => {
+      await writer.writeAll()
+      const outfilePath = resolve(config.projectDir, 'infra', 'build-pipeline.yaml')
+      assert(statSync(outfilePath))
     })
   })
 })

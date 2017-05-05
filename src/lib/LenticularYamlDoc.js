@@ -12,7 +12,7 @@ export default class LenticularYamlDoc {
   }
 
   toCloudFormationYamlString () {
-    const yamlData = yamlDataToCloudFormationYamlData(this.data, this.config)
+    const yamlData = lenticularYamlDataToCloudFormationYamlData(this.data, this.config)
     return yamlDataToString(yamlData, CLOUDFORMATION_SCHEMA)
   }
 
@@ -27,16 +27,16 @@ function yamlDataToString (data, schema) {
 }
 
 
-function yamlDataToCloudFormationYamlData (data, config) {
+function lenticularYamlDataToCloudFormationYamlData (data, config) {
   if (data.constructor === Object) {
     const copy = {}
     Object.keys(data).forEach(key => {
-      copy[key] = yamlDataToCloudFormationYamlData(data[key], config)
+      copy[key] = lenticularYamlDataToCloudFormationYamlData(data[key], config)
     })
     return copy
   }
   else if (Array.isArray(data)) {
-    return data.map(val => yamlDataToCloudFormationYamlData(val, config))
+    return data.map(val => lenticularYamlDataToCloudFormationYamlData(val, config))
   }
   else if (data instanceof LenticularYamlType) {
     return data.toCloudFormationYamlData(config)

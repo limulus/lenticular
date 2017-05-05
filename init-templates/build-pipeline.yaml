@@ -63,21 +63,39 @@ Resources:
                 - Name: SourceCode
               RunOrder: 1
 
-        - Name: DeployProduct
+        - Name: Build
           Actions:
-          - Name: AttemptCloudFormationChange
-            ActionTypeId:
-              Category: Build
-              Owner: AWS
-              Version: 1
-              Provider: CodeBuild
-            InputArtifacts:
-              - SourceCode
-            OutputArtifacts:
-              - Name: ProductArtifacts
-            Configuration:
-              ProjectName: !Ref ArtifactBuilder
-            RunOrder: 1
+            - Name: BuildProductArtifacts
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              InputArtifacts:
+                - Name: SourceCode
+              OutputArtifacts:
+                - Name: ProductArtifacts
+              Configuration:
+                ProjectName: !Ref ArtifactBuilder
+              RunOrder: 1
+
+        - Name: Deploy
+          Actions:
+            - Name: DeployInfrastructure
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              InputArtifacts:
+                - Name: ProductArtifacts
+              Configuration:
+                StackName: !Lenticular::ProductName
+                ActionMode: CREATE_UPDATE
+                Capabilities: CAPABILITY_IAM
+                TemplatePath: ProductArtifacts::infrastructure.yaml
+                RoleArn: CloudFormationRole
+              RunOrder: 1
 
   ArtifactBuilder:
     Type: AWS::CodeBuild::Project
@@ -107,6 +125,10 @@ Resources:
             post_build:
               commands:
                 - aws s3 sync build/ s3://$ARTIFACT_BUCKET/
+          artifacts:
+            type: zip
+            files:
+              - infrastructure.yaml
 
 
 # -------------------------------------------------------------------
@@ -149,6 +171,19 @@ Resources:
           Effect: Allow
           Principal:
             Service: codebuild.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  CloudFormationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: cloudformation.amazonaws.com
           Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess

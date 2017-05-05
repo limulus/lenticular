@@ -5,7 +5,7 @@ import {
 } from 'cloudformation-js-yaml-schema'
 
 
-export default class YamlDocument {
+export default class LenticularYamlDoc {
   constructor (documentString) {
     this.data = yaml.safeLoad(documentString, {schema: LENTICULAR_SCHEMA})
   }

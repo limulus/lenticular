@@ -25,8 +25,8 @@ export default class InitFileWriter {
 
   writeBuildPipelineYaml () {
     return this.applyConfigToTemplateAndWrite(
-      resolvePath(this.initTemplatesDir, 'build-pipeline.yaml'),
-      resolvePath(this.config.projectDir, 'infra', 'build-pipeline.yaml')
+      resolvePath(this.initTemplatesDir, 'pipeline.yaml'),
+      resolvePath(this.config.projectDir, 'infra', 'pipeline.yaml')
     )
   }
 

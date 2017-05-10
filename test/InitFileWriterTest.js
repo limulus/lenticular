@@ -35,9 +35,9 @@ describe(`InitFileWriter`, () => {
       })
     })
 
-    it(`should write the infra/build-pipeline.yaml file`, async () => {
+    it(`should write the infra/pipeline.yaml file`, async () => {
       await writer.writeAll()
-      const outfilePath = resolve(config.projectDir, 'infra', 'build-pipeline.yaml')
+      const outfilePath = resolve(config.projectDir, 'infra', 'pipeline.yaml')
       assert(statSync(outfilePath))
     })
   })

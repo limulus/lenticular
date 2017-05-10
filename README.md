@@ -35,7 +35,7 @@ lenticular init                        # Creates .lenticularrc and ./infra/
 ```
 
 Now, take a look at the newly created `.lenticularrc`, and
-`infra/build-pipeline.yaml`.
+`infra/pipeline.yaml`.
 
 …
 

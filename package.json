@@ -38,6 +38,7 @@
     "yazl": "^2.4.2"
   },
   "devDependencies": {
+    "aws-sdk-mock": "^1.7.0",
     "babel-cli": "^6.24.1",
     "babel-preset-env": "^1.4.0",
     "babel-preset-stage-3": "^6.24.1",

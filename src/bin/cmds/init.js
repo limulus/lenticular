@@ -7,7 +7,7 @@ export const builder = {
   'project-dir': {
     desc: `Project directory in which to write files`,
     default: process.cwd(),
-    group: 'Init Options:'
+    group: 'Options:'
   },
 }
 export const implies = {

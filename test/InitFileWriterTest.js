@@ -1,8 +1,7 @@
 import assert from 'assert'
-import {tmpdir} from 'os'
-import {mkdtemp, readFileSync, statSync} from 'fs'
+import {readFileSync, statSync} from 'fs'
 import {resolve} from 'path'
-import rimraf from 'rimraf'
+import TmpDir from './util/TempDir.js'
 
 import InitFileWriter from '../src/lib/InitFileWriter.js'
 
@@ -13,17 +12,14 @@ describe(`InitFileWriter`, () => {
     projectDir: null
   }
 
-  let writer
-  beforeEach(done => {
-    mkdtemp(resolve(tmpdir(), `lenticular-tests-`), (err, tmpdirPath) => {
-      assert.ifError(err)
-      config.projectDir = tmpdirPath
-      writer = new InitFileWriter(config)
-      return done()
-    })
+  let writer, tmpDir
+  beforeEach(async () => {
+    tmpDir = await TmpDir.createWithPrefix(`lenticular-tests-`)
+    config.projectDir = tmpDir.path
+    writer = new InitFileWriter(config)
   })
 
-  afterEach(done => rimraf(config.projectDir, done))
+  afterEach(() => tmpDir.clean())
 
   describe(`writeAll()`, () => {
     it(`should write the expected .lenticularrc file`, async () => {

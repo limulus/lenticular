@@ -12,6 +12,10 @@ export default class TempDir {
     return this.path
   }
 
+  pathForFile (file) {
+    return resolvePath(this.path, file)
+  }
+
   static async createWithPrefix (prefix) {
     return new Promise((resolve, reject) => {
       mkdtemp(resolvePath(tmpdir(), prefix), (err, path) => {

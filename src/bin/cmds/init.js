@@ -17,4 +17,10 @@ export const implies = {
 export async function handler (argv) {
   const writer = new lenticular.InitFileWriter(argv)
   await writer.writeAll()
+  console.info(`
+Wrote files to ${argv.projectDir}.
+Configuration saved to .lenticularrc.
+Your directory for infrastructure templates is "infra".
+Your directory for genrated artifacts is "artifacts". Add it to your .gitignore.
+  `.trim())
 }

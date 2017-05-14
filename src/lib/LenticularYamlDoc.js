@@ -4,6 +4,10 @@ import {
   cloudformationTags as CFTags
 } from 'cloudformation-js-yaml-schema'
 
+export function convertLenticularYamlToCloudFormationYaml (documentString, config) {
+  const doc = new LenticularYamlDoc(documentString, config)
+  return doc.toCloudFormationYamlString()
+}
 
 export default class LenticularYamlDoc {
   constructor (documentString, config={}) {

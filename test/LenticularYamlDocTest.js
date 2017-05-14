@@ -1,16 +1,19 @@
 import assert from 'assert'
+import sinon from 'sinon'
 import {readFileSync} from 'fs'
 import {resolve as resolvePath} from 'path'
 
-import LenticularYamlDoc from '../src/lib/LenticularYamlDoc.js'
+import LenticularYamlDoc, {convertLenticularYamlToCloudFormationYaml}
+  from '../src/lib/LenticularYamlDoc.js'
 
 function fixture (fileName) {
   const path = resolvePath(__dirname, `..`, `fixtures`, fileName)
   return readFileSync(path, `utf8`)
 }
 
+const config = { productName: 'projectx' }
+
 describe(`LenticularYamlDoc`, () => {
-  const config = { productName: 'projectx' }
   let doc
 
   describe(`constructor()`, () => {
@@ -52,5 +55,14 @@ describe(`LenticularYamlDoc`, () => {
         fixture(`lenticular-cf-afterTransform.yaml`).trim()
       )
     })
+  })
+})
+
+describe(`convertLenticularYamlToCloudFormationYaml()`, () => {
+  it(`should call toCloudFormationYamlString() on document object`, () => {
+    const spy = sinon.spy(LenticularYamlDoc.prototype, 'toCloudFormationYamlString')
+    convertLenticularYamlToCloudFormationYaml(`Hello: World`, config)
+    assert(spy.calledOn(sinon.match.instanceOf(LenticularYamlDoc)))
+    spy.restore()
   })
 })

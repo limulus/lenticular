@@ -1,15 +1,9 @@
 import assert from 'assert'
 import sinon from 'sinon'
-import {readFileSync} from 'fs'
-import {resolve as resolvePath} from 'path'
+import {loadFixtureAsString} from './util/fixtures.js'
 
 import LenticularYamlDoc, {convertLenticularYamlToCloudFormationYaml}
   from '../src/lib/LenticularYamlDoc.js'
-
-function fixture (fileName) {
-  const path = resolvePath(__dirname, `..`, `fixtures`, fileName)
-  return readFileSync(path, `utf8`)
-}
 
 const config = { productName: 'projectx' }
 
@@ -28,7 +22,7 @@ describe(`LenticularYamlDoc`, () => {
     })
 
     it(`should parse CloudFormation templates without error`, () => {
-      doc = new LenticularYamlDoc(fixture(`standard-cf.yaml`))
+      doc = new LenticularYamlDoc(loadFixtureAsString(`standard-cf.yaml`))
     })
   })
 
@@ -39,20 +33,20 @@ describe(`LenticularYamlDoc`, () => {
     })
 
     it(`should return functionally equivalent CloudFormation YAML`, () => {
-      doc = new LenticularYamlDoc(fixture(`standard-cf.yaml`))
+      doc = new LenticularYamlDoc(loadFixtureAsString(`standard-cf.yaml`))
       assert.strictEqual(
         doc.toYamlString().trim().replace(/\s+\r?\n/g, '\n'),
-        fixture(`standard-cf-afterParse.yaml`).trim()
+        loadFixtureAsString(`standard-cf-afterParse.yaml`).trim()
       )
     })
   })
 
   describe(`toCloudFormationYamlString()`, () => {
     it(`should handle Lenticular function translations correctly`, () => {
-      doc = new LenticularYamlDoc(fixture(`lenticular-cf.yaml`), config)
+      doc = new LenticularYamlDoc(loadFixtureAsString(`lenticular-cf.yaml`), config)
       assert.strictEqual(
         doc.toCloudFormationYamlString().trim().replace(/\s+\r?\n/g, '\n'),
-        fixture(`lenticular-cf-afterTransform.yaml`).trim()
+        loadFixtureAsString(`lenticular-cf-afterTransform.yaml`).trim()
       )
     })
   })

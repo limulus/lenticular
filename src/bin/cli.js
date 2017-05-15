@@ -25,3 +25,7 @@ yargs
   .config(config)
   .help()
   .argv
+
+process.on('unhandledRejection', err => {
+  throw err
+})

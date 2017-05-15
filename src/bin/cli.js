@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import 'source-map-support/register'
+
 import yargs from 'yargs'
 import rc from 'rc'
 import {basename as pathBasename} from 'path'

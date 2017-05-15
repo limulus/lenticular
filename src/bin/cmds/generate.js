@@ -2,7 +2,7 @@ import * as lenticular from '../../'
 import sysexits from 'sysexits'
 
 export const command = 'generate'
-export const desc = 'Generate CloudFormation templates'
+export const desc = 'Generate artifacts — CloudFormation templates & Lambda zips'
 export const builder = {
   'pipeline-only': {
     desc: `Only generate the pipeline CloudFormation template`,

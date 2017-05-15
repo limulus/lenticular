@@ -35,7 +35,7 @@ describe(`ArtifactGenerator`, () => {
     })
   })
 
-  describe(`generatePipelineTemplate`, () => {
+  describe(`generatePipelineTemplate()`, () => {
     it(`should call generateCloudFormationTemplate`, async () => {
       sinon.spy(generator, 'generateCloudFormationTemplate')
       await generator.generatePipelineTemplate()

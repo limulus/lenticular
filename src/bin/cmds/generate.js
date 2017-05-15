@@ -1,13 +1,9 @@
 import * as lenticular from '../../'
+import sysexits from 'sysexits'
 
 export const command = 'generate'
 export const desc = 'Generate CloudFormation templates'
 export const builder = {
-  'artifact-dir': {
-    desc: `Directory in which to write generated files`,
-    default: 'artifacts',
-    group: 'Options:'
-  },
   'pipeline-only': {
     desc: `Only generate the pipeline CloudFormation template`,
     boolean: true,
@@ -17,5 +13,12 @@ export const builder = {
 }
 
 export async function handler (argv) {
-  
+  const generator = new lenticular.ArtifactGenerator(argv)
+  if (argv.pipelineOnly) {
+    await generator.generatePipelineTemplate()
+  }
+  else {
+    console.error(`Sorry, only pipeline template generation working so far.`)
+    process.exit(sysexits.USAGE)
+  }
 }

@@ -22,6 +22,11 @@ yargs
       default: config.buildRegion || 'us-west-2',
       group: 'Global Options:',
     },
+    'product-dir': {
+      desc: `Path to the product (project) directory`,
+      default: process.cwd(),
+      group: 'Global Options:',
+    }
   })
   .group('help', 'Global Options:')
   .config(config)

@@ -12,6 +12,7 @@ export default class InitFileWriter {
   writeAll () {
     return Promise.all([
       this.writeRC(),
+      this.writeBuildSpec(),
       this.writeBuildPipelineYaml(),
     ])
   }
@@ -20,6 +21,13 @@ export default class InitFileWriter {
     return this.applyConfigToTemplateAndWrite(
       resolvePath(this.initTemplatesDir, 'lenticularrc.json'),
       resolvePath(this.config.productDir, '.lenticularrc')
+    )
+  }
+
+  writeBuildSpec () {
+    return this.applyConfigToTemplateAndWrite(
+      resolvePath(this.initTemplatesDir, 'buildspec.yml'),
+      resolvePath(this.config.productDir, 'buildspec.yml')
     )
   }
 
@@ -37,7 +45,7 @@ export default class InitFileWriter {
         mkdirp(parsePath(outfilePath).dir, err => {
           if (err) return reject(err)
           const outData = template(templateString, this.config)
-          writeFile(outfilePath, outData, (err) => {
+          writeFile(outfilePath, outData, {flag: 'wx'}, (err) => {
             if (err) return reject(err)
             return resolve()
           })

@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {readFileSync, statSync} from 'fs'
+import {writeFileSync, readFileSync, statSync} from 'fs'
 import {resolve} from 'path'
 import TmpDir from './util/TempDir.js'
 
@@ -36,5 +36,25 @@ describe(`InitFileWriter`, () => {
       const outfilePath = resolve(config.productDir, 'infra', 'pipeline.yaml')
       assert(statSync(outfilePath))
     })
+
+    it(`should write the buildspec.yml file`, async () => {
+      const outfilePath = resolve(config.productDir, 'buildspec.yml')
+      await writer.writeAll()
+      assert(statSync(outfilePath))
+    })
+
+    it(`should not overwite existing buildspec.yml file`, async () => {
+      const outfilePath = resolve(config.productDir, 'buildspec.yml')
+      writeFileSync(outfilePath, "foo")
+      await assertAsyncThrows(() => writer.writeAll())
+      const fileData = readFileSync(outfilePath, 'utf8')
+      assert.strictEqual(fileData, "foo")
+    })
   })
 })
+
+async function assertAsyncThrows (f) {
+  try { await f() }
+  catch (err) { return }
+  throw new Error(`Expected function to throw an error`)
+}

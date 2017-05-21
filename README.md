@@ -34,8 +34,8 @@ sudo npm install --global lenticular   # Global CLI always falls back to local.
 lenticular init                        # Creates .lenticularrc and ./infra/
 ```
 
-Now, take a look at the newly created `.lenticularrc`, and
-`infra/pipeline.yaml`.
+Now, take a look at the newly created `.lenticularrc`, `infra/pipeline.yaml`
+and `buildspec.yml` files.
 
 …
 

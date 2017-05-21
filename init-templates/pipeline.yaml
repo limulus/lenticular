@@ -113,22 +113,6 @@ Resources:
       ServiceRole: !Ref ArtifactBuilderRole
       Source:
         Type: CODEPIPELINE
-        BuildSpec: |
-          version: 0.1
-          phases:
-            install:
-              commands:
-                - npm install
-            build:
-              commands:
-                - ./node_modules/.bin/lenticular build
-            post_build:
-              commands:
-                - aws s3 sync build/ s3://$ARTIFACT_BUCKET/
-          artifacts:
-            type: zip
-            files:
-              - infrastructure.yaml
 
 
 # -------------------------------------------------------------------

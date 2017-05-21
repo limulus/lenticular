@@ -12,13 +12,13 @@ describe(`ArtifactGenerator`, () => {
   const config = {
     productName: 'projectx',
     buildRegion: 'us-east-2',
-    projectDir: null
+    productDir: null
   }
 
   let generator, tmpDir
   beforeEach(async () => {
     tmpDir = await TmpDir.createWithPrefix(`lenticular-tests-`)
-    config.projectDir = tmpDir.path
+    config.productDir = tmpDir.path
     await (new InitFileWriter(config)).writeAll()
     generator = new ArtifactGenerator(config)
   })
@@ -40,8 +40,8 @@ describe(`ArtifactGenerator`, () => {
       sinon.spy(generator, 'generateCloudFormationTemplate')
       await generator.generatePipelineTemplate()
       assert(generator.generateCloudFormationTemplate.calledWithExactly(
-        resolvePath(config.projectDir, 'infra', 'pipeline.yaml'),
-        resolvePath(config.projectDir, 'artifacts', 'infra', 'pipeline.yaml')
+        resolvePath(config.productDir, 'infra', 'pipeline.yaml'),
+        resolvePath(config.productDir, 'artifacts', 'infra', 'pipeline.yaml')
       ))
     })
   })

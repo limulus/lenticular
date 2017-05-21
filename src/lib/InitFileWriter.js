@@ -19,14 +19,14 @@ export default class InitFileWriter {
   writeRC () {
     return this.applyConfigToTemplateAndWrite(
       resolvePath(this.initTemplatesDir, 'lenticularrc.json'),
-      resolvePath(this.config.projectDir, '.lenticularrc')
+      resolvePath(this.config.productDir, '.lenticularrc')
     )
   }
 
   writeBuildPipelineYaml () {
     return this.applyConfigToTemplateAndWrite(
       resolvePath(this.initTemplatesDir, 'pipeline.yaml'),
-      resolvePath(this.config.projectDir, 'infra', 'pipeline.yaml')
+      resolvePath(this.config.productDir, 'infra', 'pipeline.yaml')
     )
   }
 

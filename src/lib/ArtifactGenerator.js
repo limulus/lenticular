@@ -10,8 +10,8 @@ export default class ArtifactGenerator {
 
   async generatePipelineTemplate () {
     return this.generateCloudFormationTemplate(
-      resolvePath(this.config.projectDir, 'infra', 'pipeline.yaml'),
-      resolvePath(this.config.projectDir, 'artifacts', 'infra', 'pipeline.yaml')
+      resolvePath(this.config.productDir, 'infra', 'pipeline.yaml'),
+      resolvePath(this.config.productDir, 'artifacts', 'infra', 'pipeline.yaml')
     )
   }
 

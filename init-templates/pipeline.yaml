@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: !Join [ ' ', [ !Lenticular::ProductName 'Build Pipeline' ] ]
+Description: '${productName} Build Pipeline'
 
 
 # -------------------------------------------------------------------

@@ -25,3 +25,8 @@ Resources:
         Rules:
           - Status: Enabled
             NoncurrentVersionExpirationInDays: 15
+
+  SomeBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Lenticular::ConfigValue productName

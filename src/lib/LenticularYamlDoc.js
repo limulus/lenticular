@@ -81,6 +81,20 @@ class ProductName extends LenticularYamlType {
   }
 }
 
+class ConfigValue extends LenticularYamlType {
+  constructor (key) {
+    super()
+    this.key = key
+  }
+
+  toCloudFormationYamlData (config) {
+    if (config[this.key] === undefined) {
+      throw new Error(`Expected ${this.key} to be present in config object`)
+    }
+    return config[this.key] + ''
+  }
+}
+
 
 const ResourceNameYamlType = new yaml.Type('!Lenticular::ResourceName', {
   kind: 'scalar',
@@ -103,10 +117,18 @@ const ProductNameYamlType = new yaml.Type('!Lenticular::ProductName', {
   represent: (ref, style) => ref.name
 })
 
+const ConfigValueYamlType = new yaml.Type('!Lenticular::ConfigValue', {
+  kind: 'scalar',
+  instanceOf: ConfigValue,
+  construct: data => new ConfigValue(data),
+  represent: (ref, style) => ref.name
+})
+
 const cfClasses = new Map(
   CFTags.map(tag => [`${tag.tag}:${tag.kind}`, tag.construct])
 )
 
 export const LENTICULAR_SCHEMA = yaml.Schema.create(CFTags.concat([
-  ResourceNameYamlType, ResourceNameWithRegionYamlType, ProductNameYamlType
+  ResourceNameYamlType, ResourceNameWithRegionYamlType, ProductNameYamlType,
+  ConfigValueYamlType
 ]))

@@ -4,8 +4,9 @@ import parseGitHubUrl from 'parse-github-repo-url'
 import * as lenticular from '../../'
 
 const pkgJson = JSON.parse(readFileSync('package.json', 'utf8'))
-if (pkgJson.repository && pkgJson.repository.url) {
-  var [githubRepoOwner, githubRepoName] = parseGitHubUrl(pkgJson.repository.url)
+if (pkgJson.repository) {
+  const repo = pkgJson.repository
+  var [githubRepoOwner, githubRepoName] = parseGitHubUrl(repo.url || repo)
 }
 
 export const command = 'init'

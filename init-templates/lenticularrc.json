@@ -1,4 +1,7 @@
 {
   "productName": "${productName}",
-  "buildRegion": "${buildRegion}"
+  "buildRegion": "${buildRegion}",
+  "githubRepoOwner": "${githubRepoOwner}",
+  "githubRepoName": "${githubRepoName}",
+  "githubRepoBranch": "${githubRepoBranch}"
 }

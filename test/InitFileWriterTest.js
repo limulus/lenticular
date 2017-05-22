@@ -9,6 +9,9 @@ describe(`InitFileWriter`, () => {
   const config = {
     productName: 'tycho',
     buildRegion: 'us-east-2',
+    githubRepoOwner: 'limulus',
+    githubRepoName: 'tycho',
+    githubRepoBranch: 'master',
     productDir: null
   }
 
@@ -27,7 +30,10 @@ describe(`InitFileWriter`, () => {
       const outfilePath = resolve(config.productDir, '.lenticularrc')
       assert.deepEqual(JSON.parse(readFileSync(outfilePath)), {
         "productName": 'tycho',
-        "buildRegion": 'us-east-2'
+        "buildRegion": 'us-east-2',
+        "githubRepoOwner": 'limulus',
+        "githubRepoName": 'tycho',
+        "githubRepoBranch": 'master',
       })
     })
 

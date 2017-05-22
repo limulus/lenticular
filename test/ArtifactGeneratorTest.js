@@ -12,6 +12,9 @@ describe(`ArtifactGenerator`, () => {
   const config = {
     productName: 'projectx',
     buildRegion: 'us-east-2',
+    githubRepoOwner: 'limulus',
+    githubRepoName: 'projectx',
+    githubRepoBranch: 'master',
     productDir: null
   }
 

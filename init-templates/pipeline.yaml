@@ -7,26 +7,9 @@ Description: '${productName} Build Pipeline'
 # -------------------------------------------------------------------
 
 Parameters:
-  GithubOauthToken:
+  GitHubOAuthToken:
     Type: String
-  GithubRepoOwner:
-    Type: String
-  GithubRepoName:
-    Type: String
-  GithubRepoBranch:
-    Type: String
-    Default: master
-
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      - Label:
-          default: GitHub Integration
-        Parameters:
-          - GithubRepoOwner
-          - GithubRepoName
-          - GithubRepoBranch
-          - GithubOauthToken
+    NoEcho: true
 
 
 Resources:
@@ -39,7 +22,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       RoleArn: !GetAtt PipelineRole.Arn
-      Name: !Lenticular::ResourceName Pipeline
+      Name: !Lenticular::ProductName
       ArtifactStore:
         Location: !Ref ArtifactBucket
         Type: S3
@@ -54,9 +37,9 @@ Resources:
                 Version: 1
                 Provider: GitHub
               Configuration:
-                Owner: !Ref GithubRepoOwner
-                Repo: !Ref GithubRepoName
-                Branch: !Ref GithubRepoBranch
+                Owner: !Lenticular::ConfigValue githubRepoOwner
+                Repo: !Lenticular::ConfigValue githubRepoName
+                Branch: !Lenticular::ConfigValue githubRepoBranch
                 OAuthToken: !Ref GithubOauthToken
               InputArtifacts: []
               OutputArtifacts:

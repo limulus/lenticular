@@ -3,5 +3,7 @@
   "buildRegion": "${buildRegion}",
   "githubRepoOwner": "${githubRepoOwner}",
   "githubRepoName": "${githubRepoName}",
-  "githubRepoBranch": "${githubRepoBranch}"
+  "githubRepoBranch": "${githubRepoBranch}",
+  "gitHubOAuthTokenParameterName": null,
+  "secretsKeyId": null
 }

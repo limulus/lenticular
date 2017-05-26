@@ -34,6 +34,8 @@ describe(`InitFileWriter`, () => {
         "githubRepoOwner": 'limulus',
         "githubRepoName": 'tycho',
         "githubRepoBranch": 'master',
+        "secretsKeyId": null,
+        "gitHubOAuthTokenParameterName": null,
       })
     })
 

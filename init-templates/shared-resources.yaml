@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Stack For Cross-Product Resources'
+
+Resources:
+
+  SecretsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: 'Key for encrypting secrets'
+      Enabled: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: 'Allow access for key admins'
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':root']]
+                # - !Join ['', ['arn:aws:iam::', !Ref 'AWS::AccountId', ':', 'user/MY_IAM_USER_NAME']]
+            Action:
+              - 'kms:*'
+            Resource: '*'
+
+  SecretsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: 'alias/secrets-key'
+      TargetKeyId: !Ref SecretsKey
+
+
+Outputs:
+  SecretsKey:
+    Description: 'Key ID for secret parameter storage'
+    Value: !Ref SecretsKey

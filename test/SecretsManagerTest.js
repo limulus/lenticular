@@ -39,15 +39,22 @@ describe(`SecretsManager`, () => {
     })
   })
 
-
-  // AWS.mock('SSM', 'getParameters', (params, cb) => {
-  //   return cb(null, {
-  //     Parameters: params.map(p => {
-  //       Name: p,
-  //       Type: 'SecureString',
-  //       Value: 'batteryhorsestaple'
-  //     })
-  //   })
-  // })
-
+  describe(`getSecret()`, () => {
+    it(`should call ssm.getParameters()`, async () => {
+      const stub = awsStub('SSM', 'getParameters')
+        .yields(null, {
+          Parameters: [{
+            Name: 'foo',
+            Value: 'bar',
+            Type: 'SecureString',
+          }]
+        })
+      const foo = await manager.getSecret('foo')
+      assert.strictEqual(foo, 'bar')
+      sinon.assert.calledWith(stub, {
+        Names: ['foo'],
+        WithDecryption: true
+      })
+    })
+  })
 })

@@ -14,4 +14,11 @@ export default class SecretsManager {
       Overwrite: true,
     }).promise()
   }
+
+  async getSecret (name) {
+    const response = await (new AWS.SSM())
+      .getParameters({ Names: [name], WithDecryption: true })
+      .promise()
+    return response.Parameters[0].Value
+  }
 }

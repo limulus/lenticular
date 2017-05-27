@@ -21,4 +21,10 @@ export default class SecretsManager {
       .promise()
     return response.Parameters[0].Value
   }
+
+  async deleteSecret (name) {
+    await (new AWS.SSM({region: this.config.buildRegion})).deleteParameter({
+      Name: name
+    }).promise()
+  }
 }

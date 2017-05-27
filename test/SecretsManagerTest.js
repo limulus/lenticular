@@ -57,4 +57,12 @@ describe(`SecretsManager`, () => {
       })
     })
   })
+
+  describe(`deleteSecret()`, () => {
+    it(`should call ssm.deleteParameter()`, async () => {
+      const stub = awsStub('SSM', 'deleteParameter').yields(null, {})
+      await manager.deleteSecret('foo')
+      sinon.assert.calledWith(stub, { Name: 'foo' })
+    })
+  })
 })

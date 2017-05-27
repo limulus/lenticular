@@ -2,6 +2,7 @@ import assert from 'assert'
 import AWS from 'aws-sdk'
 import awsMocker from 'aws-sdk-mock'
 import sinon from 'sinon'
+import assertAsyncThrows from './util/assertAsyncThrows.js'
 
 import SecretsManager from '../src/lib/SecretsManager.js'
 
@@ -55,6 +56,13 @@ describe(`SecretsManager`, () => {
         Names: ['foo'],
         WithDecryption: true
       })
+    })
+
+    it(`should throw error with nice message when parameter doesn't exist`, async () => {
+      const stub = awsStub('SSM', 'getParameters')
+        .yields(null, { Parameters: [], InvalidParameters: ['foo'] })
+      const err = await assertAsyncThrows(() => manager.getSecret('foo'))
+      assert.strictEqual(err.message, `No such SSM parameter named "foo".`)
     })
   })
 

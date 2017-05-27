@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk'
+import {inspect} from 'util'
 
 export default class SecretsManager {
   constructor (config) {
@@ -19,7 +20,16 @@ export default class SecretsManager {
     const response = await (new AWS.SSM({region: this.config.buildRegion}))
       .getParameters({ Names: [name], WithDecryption: true })
       .promise()
-    return response.Parameters[0].Value
+
+    if (response.Parameters.length > 0) {
+      return response.Parameters[0].Value
+    }
+    else if (response.Parameters.length === 0) {
+      throw new Error(`No such SSM parameter named "${name}".`)
+    }
+    else {
+      throw new Error(`Wha? Unexpected response from AWS: ${inspect(response)}`)
+    }
   }
 
   async deleteSecret (name) {

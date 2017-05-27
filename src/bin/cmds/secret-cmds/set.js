@@ -12,5 +12,5 @@ export async function handler (argv) {
     type: 'input',
     message: 'secret value: '
   }])
-  await manager.saveSecret(argv._[0], answers.value)
+  await manager.saveSecret(argv.name, answers.value)
 }

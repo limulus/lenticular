@@ -5,6 +5,6 @@ export const desc = 'Retrieve a previously stored secret value'
 
 export async function handler (argv) {
   const manager = new lenticular.SecretsManager(argv)
-  const value = await manager.getSecret(argv._[0])
+  const value = await manager.getSecret(argv.name)
   process.stdout.write(`${value}\n`)
 }

@@ -5,8 +5,8 @@ import sinon from 'sinon'
 
 import SecretsManager from '../src/lib/SecretsManager.js'
 
-function awsStub (service, method, fake) {
-  const stub = sinon.stub().callsFake(fake)
+function awsStub (service, method) {
+  const stub = sinon.stub()
   awsMocker.mock(service, method, stub)
   return stub
 }
@@ -27,17 +27,15 @@ describe(`SecretsManager`, () => {
 
   describe(`saveSecret()`, () => {
     it(`should call ssm.putParameter()`, async () => {
-      const spy = awsStub('SSM', 'putParameter', (params, cb) => {
-        return setImmediate(() => cb(null, {}))
-      })
+      const stub = awsStub('SSM', 'putParameter').yields(null, {})
       await manager.saveSecret('foo', 'bar')
-      assert(spy.calledWith({
+      sinon.assert.calledWith(stub, {
         Name: 'foo',
         Value: 'bar',
         Type: 'SecureString',
         KeyId: config.secretsKeyId,
         Overwrite: true,
-      }))
+      })
     })
   })
 

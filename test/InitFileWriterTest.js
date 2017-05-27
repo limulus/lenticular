@@ -2,6 +2,7 @@ import assert from 'assert'
 import {writeFileSync, readFileSync, statSync} from 'fs'
 import {resolve} from 'path'
 import TmpDir from './util/TempDir.js'
+import assertAsyncThrows from './util/assertAsyncThrows.js'
 
 import InitFileWriter from '../src/lib/InitFileWriter.js'
 
@@ -60,9 +61,3 @@ describe(`InitFileWriter`, () => {
     })
   })
 })
-
-async function assertAsyncThrows (f) {
-  try { await f() }
-  catch (err) { return }
-  throw new Error(`Expected function to throw an error`)
-}

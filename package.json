@@ -31,6 +31,7 @@
     "backtick-template": "^0.1.1",
     "cloudformation-js-yaml-schema": "^0.3.1",
     "fallback-cli": "^2.0.2",
+    "inquirer": "^3.0.6",
     "js-yaml": "^3.8.3",
     "mkdirp": "^0.5.1",
     "parse-github-repo-url": "^1.4.0",

@@ -10,7 +10,7 @@ export async function handler (argv) {
   const answers = await prompt([{
     name: 'value',
     type: 'input',
-    message: 'secret value: '
+    message: 'secret value:'
   }])
   await manager.saveSecret(argv.name, answers.value)
 }

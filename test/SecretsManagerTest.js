@@ -1,16 +1,9 @@
 import assert from 'assert'
-import AWS from 'aws-sdk'
-import awsMocker from 'aws-sdk-mock'
 import sinon from 'sinon'
 import assertAsyncThrows from './util/assertAsyncThrows.js'
+import * as aws from './util/aws-mock.js'
 
 import SecretsManager from '../src/lib/SecretsManager.js'
-
-function awsStub (service, method) {
-  const stub = sinon.stub()
-  awsMocker.mock(service, method, stub)
-  return stub
-}
 
 describe(`SecretsManager`, () => {
   let manager
@@ -23,12 +16,12 @@ describe(`SecretsManager`, () => {
   })
 
   afterEach(() => {
-    awsMocker.restore()
+    aws.restore()
   })
 
   describe(`saveSecret()`, () => {
     it(`should call ssm.putParameter()`, async () => {
-      const stub = awsStub('SSM', 'putParameter').yieldsAsync(null, {})
+      const stub = aws.stub('SSM', 'putParameter').yieldsAsync(null, {})
       await manager.saveSecret('foo', 'bar')
       sinon.assert.calledWith(stub, {
         Name: 'foo',
@@ -42,7 +35,7 @@ describe(`SecretsManager`, () => {
 
   describe(`getSecret()`, () => {
     it(`should call ssm.getParameters()`, async () => {
-      const stub = awsStub('SSM', 'getParameters')
+      const stub = aws.stub('SSM', 'getParameters')
         .yieldsAsync(null, {
           Parameters: [{
             Name: 'foo',
@@ -59,7 +52,7 @@ describe(`SecretsManager`, () => {
     })
 
     it(`should throw error with nice message when parameter doesn't exist`, async () => {
-      const stub = awsStub('SSM', 'getParameters')
+      const stub = aws.stub('SSM', 'getParameters')
         .yieldsAsync(null, { Parameters: [], InvalidParameters: ['foo'] })
       const err = await assertAsyncThrows(() => manager.getSecret('foo'))
       assert.strictEqual(err.message, `No such SSM parameter named "foo".`)
@@ -68,7 +61,7 @@ describe(`SecretsManager`, () => {
 
   describe(`deleteSecret()`, () => {
     it(`should call ssm.deleteParameter()`, async () => {
-      const stub = awsStub('SSM', 'deleteParameter').yieldsAsync(null, {})
+      const stub = aws.stub('SSM', 'deleteParameter').yieldsAsync(null, {})
       await manager.deleteSecret('foo')
       sinon.assert.calledWith(stub, { Name: 'foo' })
     })
@@ -76,7 +69,7 @@ describe(`SecretsManager`, () => {
 
   describe(`listSecrets()`, () => {
     it(`should call ssm.describeParameters()`, async () => {
-      const stub = awsStub('SSM', 'describeParameters')
+      const stub = aws.stub('SSM', 'describeParameters')
         .onFirstCall().yieldsAsync(null, {
           Parameters: [{
             Name: 'foo1',

@@ -3,6 +3,7 @@ import inquirer from 'inquirer'
 
 export const command = 'set <name>'
 export const desc = 'Save a secret'
+export const aliases = ['save', 'update', 'put']
 
 export async function handler (argv) {
   lenticular.configureAWS(argv)

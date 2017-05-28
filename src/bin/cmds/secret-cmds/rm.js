@@ -3,6 +3,7 @@ import inquirer from 'inquirer'
 
 export const command = 'rm <name>'
 export const desc = 'Delete a secret'
+export const aliases = ['delete', 'remove']
 
 export async function handler (argv) {
   lenticular.configureAWS(argv)

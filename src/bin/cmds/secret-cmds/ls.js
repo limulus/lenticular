@@ -2,6 +2,7 @@ import * as lenticular from '../../../'
 
 export const command = 'ls'
 export const desc = 'List previously stored secret value names'
+export const aliases = ['list']
 
 export async function handler (argv) {
   lenticular.configureAWS(argv)

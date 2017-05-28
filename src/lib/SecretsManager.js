@@ -4,7 +4,9 @@ import {inspect} from 'util'
 
 export default class SecretsManager extends Configurable {
   constructor (config) {
-    super(config)
+    super(config, {
+      extraRequiredProperties: ['buildRegion', 'secretsKeyId']
+    })
   }
 
   async saveSecret (name, value) {

@@ -6,7 +6,9 @@ import mkdirp from 'mkdirp'
 
 export default class InitFileWriter extends Configurable {
   constructor (config) {
-    super(config)
+    super(config, {
+      extraRequiredProperties: ['productDir']
+    })
     this.initTemplatesDir = resolvePath(__dirname, '..', '..', 'init-templates')
   }
 

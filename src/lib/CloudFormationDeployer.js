@@ -6,7 +6,12 @@ import {readFile} from 'fs'
 
 export default class CloudFormationDeployer extends Configurable {
   constructor (config) {
-    super(config)
+    super(config, {
+      extraRequiredProperties: [
+        'buildRegion', 'gitHubOAuthTokenParameterName', 'secretsKeyId'
+      ],
+    })
+
     this.secretsManager = new SecretsManager(config)
     this.cfEventMonitor = require('aws-cf-monitor')
   }

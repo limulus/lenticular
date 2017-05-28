@@ -1,13 +1,13 @@
 import isobject from 'isobject'
+import uniq from 'lodash.uniq'
 
 const config = Symbol('config')
+const requiredProperties = Symbol('requiredProperties')
 
-const requiredProperties = `
-  productName productDir buildRegion
-`.trim().split(/\s+/)
+const baseRequiredProperties = ['productName']
 
 export default class Configurable {
-  constructor (theConfig) {
+  constructor (theConfig, options={}) {
     if (! theConfig) {
       throw new Error(`Expected config object not passed to constructor`)
     }
@@ -15,11 +15,15 @@ export default class Configurable {
       throw new Error(`Expected plain object for config passed to constructor`)
     }
 
+    this[requiredProperties] = uniq(
+      baseRequiredProperties.concat(options.extraRequiredProperties || [])
+    )
+
     this.config = theConfig
   }
 
   set config (theConfig) {
-    requiredProperties.forEach(requiredProperty => {
+    this[requiredProperties].forEach(requiredProperty => {
       if (! theConfig.hasOwnProperty(requiredProperty)) {
         throw new Error(`Config missing required ${requiredProperty} property.`)
       }

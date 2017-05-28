@@ -11,7 +11,8 @@ describe(`CloudFormationDeployer`, () => {
     productName: 'projectx',
     productDir: process.cwd(),
     secretsKeyId: 'deadbeef-cafefeed',
-    buildRegion: 'us-west-2'
+    buildRegion: 'us-west-2',
+    gitHubOAuthTokenParameterName: '3lk3ljkasdlkjdfi3',
   }
 
   beforeEach(() => {

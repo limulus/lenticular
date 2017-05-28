@@ -6,7 +6,9 @@ import {convertLenticularYamlToCloudFormationYaml} from './LenticularYamlDoc.js'
 
 export default class ArtifactGenerator extends Configurable {
   constructor (config) {
-    super(config)
+    super(config, {
+      extraRequiredProperties: ['productDir']
+    })
   }
 
   async generatePipelineTemplate () {

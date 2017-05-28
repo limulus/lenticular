@@ -28,7 +28,7 @@ describe(`SecretsManager`, () => {
 
   describe(`saveSecret()`, () => {
     it(`should call ssm.putParameter()`, async () => {
-      const stub = awsStub('SSM', 'putParameter').yields(null, {})
+      const stub = awsStub('SSM', 'putParameter').yieldsAsync(null, {})
       await manager.saveSecret('foo', 'bar')
       sinon.assert.calledWith(stub, {
         Name: 'foo',
@@ -43,7 +43,7 @@ describe(`SecretsManager`, () => {
   describe(`getSecret()`, () => {
     it(`should call ssm.getParameters()`, async () => {
       const stub = awsStub('SSM', 'getParameters')
-        .yields(null, {
+        .yieldsAsync(null, {
           Parameters: [{
             Name: 'foo',
             Value: 'bar',
@@ -60,7 +60,7 @@ describe(`SecretsManager`, () => {
 
     it(`should throw error with nice message when parameter doesn't exist`, async () => {
       const stub = awsStub('SSM', 'getParameters')
-        .yields(null, { Parameters: [], InvalidParameters: ['foo'] })
+        .yieldsAsync(null, { Parameters: [], InvalidParameters: ['foo'] })
       const err = await assertAsyncThrows(() => manager.getSecret('foo'))
       assert.strictEqual(err.message, `No such SSM parameter named "foo".`)
     })
@@ -68,7 +68,7 @@ describe(`SecretsManager`, () => {
 
   describe(`deleteSecret()`, () => {
     it(`should call ssm.deleteParameter()`, async () => {
-      const stub = awsStub('SSM', 'deleteParameter').yields(null, {})
+      const stub = awsStub('SSM', 'deleteParameter').yieldsAsync(null, {})
       await manager.deleteSecret('foo')
       sinon.assert.calledWith(stub, { Name: 'foo' })
     })

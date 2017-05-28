@@ -1,5 +1,6 @@
 import isobject from 'isobject'
 import uniq from 'lodash.uniq'
+import AWS from 'aws-sdk'
 
 const config = Symbol('config')
 const requiredProperties = Symbol('requiredProperties')
@@ -23,15 +24,28 @@ export default class Configurable {
   }
 
   set config (theConfig) {
-    this[requiredProperties].forEach(requiredProperty => {
-      if (! theConfig.hasOwnProperty(requiredProperty)) {
-        throw new Error(`Config missing required ${requiredProperty} property.`)
-      }
-    })
+    assertConfigHasRequiredProperties(theConfig, this[requiredProperties])
     this[config] = Object.assign({}, theConfig)
   }
 
   get config () {
     return Object.assign({}, this[config])
   }
+}
+
+function assertConfigHasRequiredProperties (theConfig, requiredProperties) {
+  requiredProperties.forEach(requiredProperty => {
+    if (! theConfig.hasOwnProperty(requiredProperty)) {
+      throw new Error(`Config missing required ${requiredProperty} property.`)
+    }
+  })
+}
+
+export function configureAWS (theConfig) {
+  assertConfigHasRequiredProperties(
+    theConfig,
+    baseRequiredProperties.concat(['buildRegion'])
+  )
+
+  AWS.config.update({ region: theConfig.buildRegion })
 }

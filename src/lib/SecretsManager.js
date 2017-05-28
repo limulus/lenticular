@@ -10,7 +10,7 @@ export default class SecretsManager extends Configurable {
   }
 
   async saveSecret (name, value) {
-    await (new AWS.SSM({region: this.config.buildRegion})).putParameter({
+    await (new AWS.SSM()).putParameter({
       Name: name,
       Value: value,
       Type: 'SecureString',
@@ -20,7 +20,7 @@ export default class SecretsManager extends Configurable {
   }
 
   async getSecret (name) {
-    const response = await (new AWS.SSM({region: this.config.buildRegion}))
+    const response = await (new AWS.SSM())
       .getParameters({ Names: [name], WithDecryption: true })
       .promise()
 
@@ -36,7 +36,7 @@ export default class SecretsManager extends Configurable {
   }
 
   async deleteSecret (name) {
-    await (new AWS.SSM({region: this.config.buildRegion})).deleteParameter({
+    await (new AWS.SSM()).deleteParameter({
       Name: name
     }).promise()
   }
@@ -50,7 +50,7 @@ export default class SecretsManager extends Configurable {
         { Filters: [{ Key: 'KeyId', Values: [this.config.secretsKeyId] }] }
       )
 
-      const response = await (new AWS.SSM({region: this.config.buildRegion}))
+      const response = await (new AWS.SSM())
         .describeParameters(request).promise()
 
       secrets = secrets.concat(response.Parameters.map(p => p.Name))

@@ -5,6 +5,7 @@ export const command = 'rm <name>'
 export const desc = 'Delete a secret'
 
 export async function handler (argv) {
+  lenticular.configureAWS(argv)
   const manager = new lenticular.SecretsManager(argv)
 
   const prompt = inquirer.createPromptModule()

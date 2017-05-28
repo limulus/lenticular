@@ -5,6 +5,7 @@ export const command = 'set <name>'
 export const desc = 'Save a secret'
 
 export async function handler (argv) {
+  lenticular.configureAWS(argv)
   const manager = new lenticular.SecretsManager(argv)
   const prompt = inquirer.createPromptModule()
   const answers = await prompt([{

@@ -19,7 +19,7 @@ yargs
     },
     'build-region': {
       desc: `Region for product's build pipeline`,
-      default: config.buildRegion || 'us-west-2',
+      default: config.buildRegion,
       group: 'Global Options:',
     },
     'product-dir': {

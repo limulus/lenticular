@@ -1,5 +1,4 @@
 import AWS from 'aws-sdk'
-import cfEventMonitor from 'aws-cf-monitor'
 import SecretsManager from './SecretsManager.js'
 import {convertLenticularYamlToCloudFormationYaml} from './LenticularYamlDoc.js'
 import {readFile} from 'fs'
@@ -8,7 +7,7 @@ export default class CloudFormationDeployer {
   constructor (config) {
     this.config = config
     this.secretsManager = new SecretsManager(config)
-    this.cfEventMonitor = cfEventMonitor
+    this.cfEventMonitor = require('aws-cf-monitor')
   }
 
   async deployPipeline () {
@@ -19,11 +18,11 @@ export default class CloudFormationDeployer {
         GitHubOAuthToken: this.config.gitHubOAuthTokenParameterName
       }
     }
-    return this.deploy(`${this.config.productName}-pipeline`, cfYaml, opts)
+    return await this.deploy(`${this.config.productName}-pipeline`, cfYaml, opts)
   }
 
   async deploy (StackName, TemplateBody, opts={}) {
-    const cf = new AWS.CloudFormation({region: this.config.buildRegion})
+    const cf = new AWS.CloudFormation()
 
     let updateStack = this.cfEventMonitor.updateStack
     try {

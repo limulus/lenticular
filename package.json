@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/limulus/lenticular#readme",
   "dependencies": {
+    "aws-cf-monitor": "^1.0.2",
     "aws-sdk": "^2.58.0",
     "backtick-template": "^0.1.1",
     "cloudformation-js-yaml-schema": "^0.3.1",

@@ -1,9 +1,10 @@
+import Configurable from './Configurable.js'
 import AWS from 'aws-sdk'
 import {inspect} from 'util'
 
-export default class SecretsManager {
+export default class SecretsManager extends Configurable {
   constructor (config) {
-    this.config = config
+    super(config)
   }
 
   async saveSecret (name, value) {

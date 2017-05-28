@@ -1,11 +1,12 @@
+import Configurable from './Configurable.js'
 import {readFile, writeFile} from 'fs'
 import {resolve as resolvePath, parse as parsePath} from 'path'
 import mkdirp from 'mkdirp'
 import {convertLenticularYamlToCloudFormationYaml} from './LenticularYamlDoc.js'
 
-export default class ArtifactGenerator {
+export default class ArtifactGenerator extends Configurable {
   constructor (config) {
-    this.config = config
+    super(config)
   }
 
   async generatePipelineTemplate () {

@@ -1,11 +1,12 @@
+import Configurable from './Configurable.js'
 import {readFile, writeFile} from 'fs'
 import {resolve as resolvePath, parse as parsePath} from 'path'
 import template from 'backtick-template'
 import mkdirp from 'mkdirp'
 
-export default class InitFileWriter {
+export default class InitFileWriter extends Configurable {
   constructor (config) {
-    this.config = config
+    super(config)
     this.initTemplatesDir = resolvePath(__dirname, '..', '..', 'init-templates')
   }
 

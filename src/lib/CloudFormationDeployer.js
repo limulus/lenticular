@@ -1,11 +1,12 @@
 import AWS from 'aws-sdk'
+import Configurable from './Configurable.js'
 import SecretsManager from './SecretsManager.js'
 import {convertLenticularYamlToCloudFormationYaml} from './LenticularYamlDoc.js'
 import {readFile} from 'fs'
 
-export default class CloudFormationDeployer {
+export default class CloudFormationDeployer extends Configurable {
   constructor (config) {
-    this.config = config
+    super(config)
     this.secretsManager = new SecretsManager(config)
     this.cfEventMonitor = require('aws-cf-monitor')
   }

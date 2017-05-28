@@ -5,7 +5,11 @@ import {loadFixtureAsString} from './util/fixtures.js'
 import LenticularYamlDoc, {convertLenticularYamlToCloudFormationYaml}
   from '../src/lib/LenticularYamlDoc.js'
 
-const config = { productName: 'projectx' }
+const config = {
+  productName: 'projectx',
+  productDir: process.cwd(),
+  buildRegion: 'us-west-2',
+}
 
 describe(`LenticularYamlDoc`, () => {
   let doc
@@ -13,27 +17,27 @@ describe(`LenticularYamlDoc`, () => {
   describe(`constructor()`, () => {
     it(`should throw if document is not YAML`, () => {
       assert.throws(() => {
-        doc = new LenticularYamlDoc(`:`)
+        doc = new LenticularYamlDoc(`:`, config)
       })
     })
 
     it(`should not throw if document is YAML`, () => {
-      doc = new LenticularYamlDoc(`Hello: 'World'`)
+      doc = new LenticularYamlDoc(`Hello: 'World'`, config)
     })
 
     it(`should parse CloudFormation templates without error`, () => {
-      doc = new LenticularYamlDoc(loadFixtureAsString(`standard-cf.yaml`))
+      doc = new LenticularYamlDoc(loadFixtureAsString(`standard-cf.yaml`), config)
     })
   })
 
   describe(`toYamlString()`, () => {
     it(`should return functionally equivalent YAML`, () => {
-      doc = new LenticularYamlDoc(`Hello: 'World'`)
+      doc = new LenticularYamlDoc(`Hello: 'World'`, config)
       assert.strictEqual(doc.toYamlString().trim(), `Hello: World`)
     })
 
     it(`should return functionally equivalent CloudFormation YAML`, () => {
-      doc = new LenticularYamlDoc(loadFixtureAsString(`standard-cf.yaml`))
+      doc = new LenticularYamlDoc(loadFixtureAsString(`standard-cf.yaml`), config)
       assert.strictEqual(
         doc.toYamlString().trim().replace(/\s+\r?\n/g, '\n'),
         loadFixtureAsString(`standard-cf-afterParse.yaml`).trim()

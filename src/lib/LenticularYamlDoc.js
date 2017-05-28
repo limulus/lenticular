@@ -1,3 +1,4 @@
+import Configurable from './Configurable.js'
 import yaml from 'js-yaml'
 import {
   CLOUDFORMATION_SCHEMA,
@@ -9,10 +10,10 @@ export function convertLenticularYamlToCloudFormationYaml (documentString, confi
   return doc.toCloudFormationYamlString()
 }
 
-export default class LenticularYamlDoc {
-  constructor (documentString, config={}) {
+export default class LenticularYamlDoc extends Configurable {
+  constructor (documentString, config) {
+    super(config)
     this.data = yaml.safeLoad(documentString, {schema: LENTICULAR_SCHEMA})
-    this.config = config
   }
 
   toCloudFormationYamlString () {

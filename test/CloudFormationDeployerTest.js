@@ -8,6 +8,8 @@ import SecretsManager from '../src/lib/SecretsManager.js'
 describe(`CloudFormationDeployer`, () => {
   let deployer
   const config = {
+    productName: 'projectx',
+    productDir: process.cwd(),
     secretsKeyId: 'deadbeef-cafefeed',
     buildRegion: 'us-west-2'
   }

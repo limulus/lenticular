@@ -8,6 +8,9 @@ import SecretsManager from '../src/lib/SecretsManager.js'
 describe(`SecretsManager`, () => {
   let manager
   const config = {
+    productName: 'projectx',
+    productDir: process.cwd(),
+    buildRegion: 'us-west-2',
     secretsKeyId: 'deadbeef-cafefeed'
   }
 

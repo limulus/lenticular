@@ -60,6 +60,13 @@ export default class CloudFormationDeployer extends Configurable {
       Parameters,
       Capabilities: ['CAPABILITY_IAM'],
     })
+
+    const stackDesc = await cf.describeStacks({ StackName }).promise()
+    const outputs = {}
+    stackDesc.Stacks[0].Outputs.forEach(o => {
+      outputs[o.OutputKey] = o.OutputValue
+    })
+    return outputs
   }
 }
 

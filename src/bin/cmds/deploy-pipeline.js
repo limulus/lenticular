@@ -7,5 +7,12 @@ export const builder = {}
 export async function handler (argv) {
   lenticular.configureAWS(argv)
   const deployer = new lenticular.CloudFormationDeployer(argv)
-  await deployer.deployPipeline()
+  const outputs = await deployer.deployPipeline()
+
+  if (Object.keys(outputs).length) {
+    process.stdout.write(`Outputs from stack:\n`)
+    Object.keys(outputs).forEach(o => {
+      process.stdout.write(`  ${o}: ${outputs[o]}\n`)
+    })
+  }
 }

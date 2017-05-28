@@ -37,4 +37,23 @@ export default class SecretsManager {
       Name: name
     }).promise()
   }
+
+  async listSecrets () {
+    let nextToken, secrets = []
+
+    do {
+      const request = Object.assign(
+        nextToken ? { NextToken: nextToken} : {},
+        { Filters: [{ Key: 'KeyId', Values: [this.config.secretsKeyId] }] }
+      )
+
+      const response = await (new AWS.SSM({region: this.config.buildRegion}))
+        .describeParameters(request).promise()
+
+      secrets = secrets.concat(response.Parameters.map(p => p.Name))
+      nextToken = response.NextToken
+    } while (nextToken)
+
+    return secrets
+  }
 }

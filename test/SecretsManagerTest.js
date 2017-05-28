@@ -73,4 +73,39 @@ describe(`SecretsManager`, () => {
       sinon.assert.calledWith(stub, { Name: 'foo' })
     })
   })
+
+  describe(`listSecrets()`, () => {
+    it(`should call ssm.describeParameters()`, async () => {
+      const stub = awsStub('SSM', 'describeParameters')
+        .onFirstCall().yieldsAsync(null, {
+          Parameters: [{
+            Name: 'foo1',
+            Type: 'SecureString',
+            KeyId: config.secretsKeyId,
+          }],
+          NextToken: 'paginationtoken',
+        })
+        .onSecondCall().yieldsAsync(null, {
+          Parameters: [{
+            Name: 'foo2',
+            Type: 'SecureString',
+            KeyId: config.secretsKeyId
+          }],
+          NextToken: ''
+        })
+
+      const secrets = await manager.listSecrets()
+
+      sinon.assert.calledTwice(stub)
+      sinon.assert.calledWith(stub, {
+        Filters: [{ Key: 'KeyId', Values: [config.secretsKeyId]}]
+      })
+      sinon.assert.calledWith(stub, {
+        Filters: [{ Key: 'KeyId', Values: [config.secretsKeyId]}],
+        NextToken: 'paginationtoken'
+      })
+
+      assert.deepEqual(secrets, ['foo1', 'foo2'])
+    })
+  })
 })

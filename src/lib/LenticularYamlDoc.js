@@ -33,7 +33,7 @@ function yamlDataToString (data, schema) {
 
 
 function lenticularYamlDataToCloudFormationYamlData (data, config) {
-  if (data.constructor === Object) {
+  if (data !== null && data.constructor === Object) {
     const copy = {}
     Object.keys(data).forEach(key => {
       copy[key] = lenticularYamlDataToCloudFormationYamlData(data[key], config)

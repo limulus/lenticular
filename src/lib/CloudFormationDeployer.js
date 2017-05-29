@@ -58,7 +58,7 @@ export default class CloudFormationDeployer extends Configurable {
       StackName,
       TemplateBody,
       Parameters,
-      Capabilities: ['CAPABILITY_IAM'],
+      Capabilities: ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'],
     })
 
     const stackDesc = await cf.describeStacks({ StackName }).promise()

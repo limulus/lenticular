@@ -10,6 +10,7 @@ describe(`InitFileWriter`, () => {
   const config = {
     productName: 'tycho',
     buildRegion: 'us-east-2',
+    iamAdminUser: 'admin',
     githubRepoOwner: 'limulus',
     githubRepoName: 'tycho',
     githubRepoBranch: 'master',
@@ -32,6 +33,7 @@ describe(`InitFileWriter`, () => {
       assert.deepEqual(JSON.parse(readFileSync(outfilePath)), {
         "productName": 'tycho',
         "buildRegion": 'us-east-2',
+        "iamAdminUser": 'admin',
         "githubRepoOwner": 'limulus',
         "githubRepoName": 'tycho',
         "githubRepoBranch": 'master',

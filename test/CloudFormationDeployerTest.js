@@ -12,7 +12,7 @@ describe(`CloudFormationDeployer`, () => {
     productDir: process.cwd(),
     secretsKeyId: 'deadbeef-cafefeed',
     buildRegion: 'us-west-2',
-    gitHubOAuthTokenParameterName: '3lk3ljkasdlkjdfi3',
+    githubTokenSecret: '3lk3ljkasdlkjdfi3',
   }
 
   const defaultDescribeStacksResult = {

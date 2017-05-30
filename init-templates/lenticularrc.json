@@ -5,6 +5,6 @@
   "githubRepoOwner": "${githubRepoOwner}",
   "githubRepoName": "${githubRepoName}",
   "githubRepoBranch": "${githubRepoBranch}",
-  "gitHubOAuthTokenParameterName": null,
-  "secretsKeyId": null
+  "githubTokenSecret": "${githubTokenSecret}",
+  "secretsKeyId": "${secretsKeyId}"
 }

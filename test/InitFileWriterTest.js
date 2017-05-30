@@ -14,6 +14,8 @@ describe(`InitFileWriter`, () => {
     githubRepoOwner: 'limulus',
     githubRepoName: 'tycho',
     githubRepoBranch: 'master',
+    githubTokenSecret: 'github-limulus-token',
+    secretsKeyId: 'jjk3-323434l32j3-3lkjlkj',
     productDir: null
   }
 
@@ -37,8 +39,8 @@ describe(`InitFileWriter`, () => {
         "githubRepoOwner": 'limulus',
         "githubRepoName": 'tycho',
         "githubRepoBranch": 'master',
-        "secretsKeyId": null,
-        "gitHubOAuthTokenParameterName": null,
+        "secretsKeyId": 'jjk3-323434l32j3-3lkjlkj',
+        "githubTokenSecret": 'github-limulus-token',
       })
     })
 

@@ -16,6 +16,8 @@ describe(`ArtifactGenerator`, () => {
     githubRepoOwner: 'limulus',
     githubRepoName: 'projectx',
     githubRepoBranch: 'master',
+    githubTokenSecret: 'github-limulus-token',
+    secretsKeyId: 'jjk3-323434l32j3-3lkjlkj',
     productDir: null
   }
 

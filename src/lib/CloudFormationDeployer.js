@@ -8,7 +8,7 @@ export default class CloudFormationDeployer extends Configurable {
   constructor (config) {
     super(config, {
       extraRequiredProperties: [
-        'buildRegion', 'gitHubOAuthTokenParameterName', 'secretsKeyId'
+        'buildRegion', 'githubTokenSecret', 'secretsKeyId'
       ],
     })
 
@@ -21,7 +21,7 @@ export default class CloudFormationDeployer extends Configurable {
     const cfYaml = convertLenticularYamlToCloudFormationYaml(pipelineYaml, this.config)
     const opts = {
       secretParameters: {
-        GitHubOAuthToken: this.config.gitHubOAuthTokenParameterName
+        GitHubOAuthToken: this.config.githubTokenSecret
       }
     }
     return await this.deploy(`${this.config.productName}-pipeline`, cfYaml, opts)

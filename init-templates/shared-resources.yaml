@@ -20,6 +20,15 @@ Resources:
             Action:
               - 'kms:*'
             Resource: '*'
+          - Sid: 'Allow read access for build system'
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - codebuild.amazonaws.com
+            Action:
+              - 'kms:Decrypt'
+            Resource: '*'
 
   SecretsKeyAlias:
     Type: AWS::KMS::Alias
@@ -32,3 +41,8 @@ Outputs:
   SecretsKey:
     Description: 'Key ID for secret parameter storage'
     Value: !Ref SecretsKey
+  SecretsKeyArn:
+    Description: 'The arn for the secrets key'
+    Value: !GetAtt SecretsKey.Arn
+    Export:
+      Name: SecretsKeyArn

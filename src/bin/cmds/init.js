@@ -31,7 +31,12 @@ export const builder = {
     desc: `Name of branch build pipeline gets its code from`,
     default: 'master',
     group: 'Options:'
-  }
+  },
+  'iam-admin-user': {
+    desc: `IAM user name that you will use to deploy your pipeline`,
+    default: 'admin',
+    group: 'Options:'
+  },
 }
 export const implies = {
   'product-dir': 'product-name',

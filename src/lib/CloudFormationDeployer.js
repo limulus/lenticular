@@ -3,6 +3,7 @@ import Configurable from './Configurable.js'
 import SecretsManager from './SecretsManager.js'
 import {convertLenticularYamlToCloudFormationYaml} from './LenticularYamlDoc.js'
 import {readFile} from 'fs'
+import cfMonitor from 'aws-cf-monitor'
 
 export default class CloudFormationDeployer extends Configurable {
   constructor (config) {
@@ -13,7 +14,6 @@ export default class CloudFormationDeployer extends Configurable {
     })
 
     this.secretsManager = new SecretsManager(config)
-    this.cfEventMonitor = require('aws-cf-monitor')
   }
 
   async deployPipeline () {
@@ -30,13 +30,13 @@ export default class CloudFormationDeployer extends Configurable {
   async deploy (StackName, TemplateBody, opts={}) {
     const cf = new AWS.CloudFormation()
 
-    let updateStack = this.cfEventMonitor.updateStack
+    let updateStack = cfMonitor.updateStack
     try {
       await cf.describeStacks({ StackName }).promise()
     }
     catch (err) {
       if (err.message.match(/does not exist/)) {
-        updateStack = this.cfEventMonitor.createStack
+        updateStack = cfMonitor.createStack
       }
       else {
         throw err

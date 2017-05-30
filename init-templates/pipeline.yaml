@@ -169,30 +169,30 @@ Resources:
                   .update(event.body, 'utf-8')
                   .digest('hex')
 
-                if (receivedSignature !== `sha1=${expectedSignature}`) {
-                  console.log(`Expected signature '${expectedSignature}'`)
+                if (receivedSignature !== `sha1=$${expectedSignature}`) {
+                  console.log(`Expected signature '$${expectedSignature}'`)
                   const statusCode = 401, body = 'Failed signature validation'
                   return cb(null, { statusCode, body })
                 }
 
-                if (eventType === 'push' && payload.ref === `refs/heads/${branch}`) {
+                if (eventType === 'push' && payload.ref === `refs/heads/$${branch}`) {
                   const cp = new AWS.CodePipeline()
                   const name = process.env.PIPELINE_NAME
                   cp.startPipelineExecution({name}).promise()
                     .then(response => {
-                      console.log(`Successfully started pipeline execution. ${response.pipelineExecutionId}`)
+                      console.log(`Successfully started pipeline execution. $${response.pipelineExecutionId}`)
                       const statusCode = 200, body = JSON.stringify(response)
                       return cb(null, { statusCode, body })
                     })
                     .catch(err => {
-                      console.log(`Failed to start pipeline execution. ${err.message}`)
+                      console.log(`Failed to start pipeline execution. $${err.message}`)
                       const statusCode = 500, body = err.message
                       return cb(null, { statusCode, body })
                     })
                 }
               })
               .catch(err => {
-                console.log(`ssm.getParameters failed. ${err.message}`)
+                console.log(`ssm.getParameters failed. $${err.message}`)
                 const statusCode = 500, body = err.message
                 return cb(null, { statusCode, body })
               })
@@ -203,7 +203,7 @@ Resources:
     Properties:
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*'
+      SourceArn: !Sub 'arn:aws:execute-api:$${AWS::Region}:$${AWS::AccountId}:*'
       FunctionName: !GetAtt GitHubWebhookHandlerFunction.Arn
 
   GitHubWebhookApi:
@@ -222,7 +222,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         PassthroughBehavior: when_no_match
-        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GitHubWebhookHandlerFunction.Arn}/invocations'
+        Uri: !Sub 'arn:aws:apigateway:$${AWS::Region}:lambda:path/2015-03-31/functions/$${GitHubWebhookHandlerFunction.Arn}/invocations'
         IntegrationHttpMethod: POST
 
   GitHubWebhookApiDeployment:
@@ -295,11 +295,11 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Resource: !Sub 'arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${Pipeline}'
+                Resource: !Sub 'arn:aws:codepipeline:$${AWS::Region}:$${AWS::AccountId}:$${Pipeline}'
                 Action:
                   - 'codepipeline:StartPipelineExecution'
               - Effect: Allow
-                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/vcr-cloud-github-webhook-secret' # FIXME !Ref GitHubWebhookSecretName
+                Resource: !Sub 'arn:aws:ssm:$${AWS::Region}:$${AWS::AccountId}:parameter/vcr-cloud-github-webhook-secret' # FIXME !Ref GitHubWebhookSecretName
                 Action:
                   - 'ssm:GetParameters'
               - Effect: Allow
@@ -307,7 +307,7 @@ Resources:
                 Action:
                   - 'kms:Decrypt'
               - Effect: Allow
-                Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*'
+                Resource: !Sub 'arn:aws:logs:$${AWS::Region}:$${AWS::AccountId}:*'
                 Action:
                   - 'logs:CreateLog*'
                   - 'logs:PutLog*'
@@ -321,4 +321,4 @@ Outputs:
   pipelineId:
     Value: !Ref 'Pipeline'
   GitHubWebhookUri:
-    Value: !Sub "https://${GitHubWebhookApi}.execute-api.${AWS::Region}.amazonaws.com/v1/"
+    Value: !Sub "https://$${GitHubWebhookApi}.execute-api.$${AWS::Region}.amazonaws.com/v1/"

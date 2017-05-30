@@ -47,7 +47,8 @@ export default class InitFileWriter extends Configurable {
         if (err) return reject(err)
         mkdirp(parsePath(outfilePath).dir, err => {
           if (err) return reject(err)
-          const outData = template(templateString, this.config)
+          const outData = template(templateString.replace(/\$\${/g, '%%%%%%{'), this.config)
+            .replace(/%%%%%%{/g, '${')
           writeFile(outfilePath, outData, {flag: 'wx'}, (err) => {
             if (err) return reject(err)
             return resolve()

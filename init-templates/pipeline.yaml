@@ -7,7 +7,7 @@ Description: '${productName} Build Pipeline'
 # -------------------------------------------------------------------
 
 Parameters:
-  GitHubOAuthToken:
+  GitHubOauthToken:
     Type: String
     NoEcho: true
   # GitHubWebhookSecretName:
@@ -42,7 +42,7 @@ Resources:
                 Owner: !Lenticular::ConfigValue githubRepoOwner
                 Repo: !Lenticular::ConfigValue githubRepoName
                 Branch: !Lenticular::ConfigValue githubRepoBranch
-                OAuthToken: !Ref GithubOauthToken
+                OAuthToken: !Ref GitHubOauthToken
               InputArtifacts: []
               OutputArtifacts:
                 - Name: SourceCode
@@ -241,6 +241,7 @@ Resources:
   PipelineRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Lenticular::ResourceNameWithRegion pipleine
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -255,6 +256,7 @@ Resources:
   ArtifactBuilderRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Lenticular::ResourceNameWithRegion artifact-builder
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -262,12 +264,31 @@ Resources:
           Principal:
             Service: codebuild.amazonaws.com
           Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
+      Policies:
+        - PolicyName: artifact-builder
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Resource: !Sub '$${ArtifactBucket.Arn}:*'
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:PutObject
+              - Effect: Allow
+                Resource: '*'
+                Action:
+                  - codecommit:GitPull
+              - Effect: Allow
+                Resource: !Sub 'arn:aws:logs:$${AWS::Region}:$${AWS::AccountId}:*'
+                Action:
+                  - 'logs:CreateLog*'
+                  - 'logs:PutLog*'
 
   CloudFormationRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Lenticular::ResourceNameWithRegion cloudformation
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -281,7 +302,7 @@ Resources:
   GitHubWebhookHandlerRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Lenticular::ResourceName github-webhook-handler
+      RoleName: !Lenticular::ResourceNameWithRegion github-webhook-handler
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -290,7 +311,7 @@ Resources:
           Principal:
             Service: lambda.amazonaws.com
       Policies:
-        - PolicyName: !Lenticular::ResourceName github-webhook-handler
+        - PolicyName: github-webhook-handler
           PolicyDocument:
             Version: '2012-10-17'
             Statement:

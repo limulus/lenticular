@@ -21,7 +21,7 @@ export default class CloudFormationDeployer extends Configurable {
     const cfYaml = convertLenticularYamlToCloudFormationYaml(pipelineYaml, this.config)
     const opts = {
       secretParameters: {
-        GitHubOAuthToken: this.config.githubTokenSecret
+        GitHubOauthToken: this.config.githubTokenSecret
       }
     }
     return await this.deploy(`${this.config.productName}-pipeline`, cfYaml, opts)

@@ -4,6 +4,7 @@ import * as aws from './util/aws-mock.js'
 
 import CFDeployer from '../src/lib/CloudFormationDeployer.js'
 import SecretsManager from '../src/lib/SecretsManager.js'
+import cfMonitor from 'aws-cf-monitor'
 
 describe(`CloudFormationDeployer`, () => {
   let deployer
@@ -37,13 +38,11 @@ describe(`CloudFormationDeployer`, () => {
         .onFirstCall().yieldsAsync(new Error(`Stack with id some-stack does not exist`))
         .onSecondCall().yieldsAsync(null, defaultDescribeStacksResult)
 
-      const mock = sinon.mock(deployer.cfEventMonitor)
-        .expects('createStack').once()
-        .resolves({ StackId: 'stack0' })
+      const mock = sinon.mock(cfMonitor)
+      mock.expects('createStack').once().resolves({ StackId: 'stack0' })
 
       await deployer.deploy('some-stack', `TemplateBody`)
 
-      deployer.cfEventMonitor.createStack.restore()
       mock.verify()
     })
 
@@ -51,23 +50,21 @@ describe(`CloudFormationDeployer`, () => {
       aws.stub('CloudFormation', 'describeStacks')
         .yieldsAsync(null, defaultDescribeStacksResult)
 
-      const mock = sinon.mock(deployer.cfEventMonitor)
-        .expects('updateStack').once()
-        .resolves({ StackId: 'stack0' })
+      const mock = sinon.mock(cfMonitor)
+      mock.expects('updateStack').once().resolves({ StackId: 'stack0' })
 
       await deployer.deploy('some-stack', `TemplateBody`)
 
-      deployer.cfEventMonitor.updateStack.restore()
       mock.verify()
     })
 
     it(`should call SecretsManager.get() to retreive secret params`, async () => {
       aws.stub('CloudFormation', 'describeStacks')
         .yieldsAsync(null, defaultDescribeStacksResult)
-      const stub = sinon.stub(deployer.cfEventMonitor, 'updateStack').resolves({})
+      const stub = sinon.stub(cfMonitor, 'updateStack').resolves({})
 
       const mock = sinon.mock(deployer.secretsManager)
-        .expects('getSecret').once().withExactArgs('supersecretparam')
+      mock.expects('getSecret').once().withExactArgs('supersecretparam')
 
       await deployer.deploy('some-stack', `TemplateBody`, { secretParameters: ['supersecretparam'] })
 
@@ -76,7 +73,7 @@ describe(`CloudFormationDeployer`, () => {
     })
 
     it(`should return outputs from stack`, async () => {
-      const updateStackStub = sinon.stub(deployer.cfEventMonitor, 'updateStack')
+      const updateStackStub = sinon.stub(cfMonitor, 'updateStack')
         .resolves({})
       const stub = aws.stub('CloudFormation', 'describeStacks')
         .yieldsAsync(null, defaultDescribeStacksResult)

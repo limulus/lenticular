@@ -10,14 +10,14 @@ Parameters:
   GitHubOauthToken:
     Type: String
     NoEcho: true
-  # GitHubWebhookSecretName:
-  #   Type: String
+  GitHubWebhookSecret:
+    Type: String
 
 
 Resources:
 
 # -------------------------------------------------------------------
-# Resources: CodePipeline for
+# Resources: CodePipeline for ${productName}
 # -------------------------------------------------------------------
 
   Pipeline:
@@ -129,7 +129,7 @@ Resources:
       Role: !GetAtt GitHubWebhookHandlerRole.Arn
       Environment:
         Variables:
-          GITHUB_WEBHOOK_SECRET_NAME: vcr-cloud-github-webhook-secret  #!Ref GitHubWebhookSecretName
+          GITHUB_WEBHOOK_SECRET: !Ref GitHubWebhookSecret
           GITHUB_REPO_BRANCH: master     # FIXME
           PIPELINE_NAME: !Ref Pipeline
       Code:
@@ -138,7 +138,7 @@ Resources:
           const createHmac = require('crypto').createHmac
 
           module.exports.handler = (event, context, cb) => {
-            const githubWebhookSecretName = process.env.GITHUB_WEBHOOK_SECRET_NAME
+            const githubWebhookSecret = process.env.GITHUB_WEBHOOK_SECRET
             const branch = process.env.GITHUB_REPO_BRANCH
 
             const receivedSignature = event.headers['X-Hub-Signature']
@@ -161,7 +161,7 @@ Resources:
             }
 
             const ssm = new AWS.SSM()
-            const Names = [githubWebhookSecretName], WithDecryption = true
+            const Names = [githubWebhookSecret], WithDecryption = true
             ssm.getParameters({ Names, WithDecryption }).promise()
               .then(response => {
                 const secret = response.Parameters[0].Value
@@ -352,7 +352,7 @@ Resources:
                 Action:
                   - 'codepipeline:StartPipelineExecution'
               - Effect: Allow
-                Resource: !Sub 'arn:aws:ssm:$${AWS::Region}:$${AWS::AccountId}:parameter/vcr-cloud-github-webhook-secret' # FIXME !Ref GitHubWebhookSecretName
+                Resource: !Sub 'arn:aws:ssm:$${AWS::Region}:$${AWS::AccountId}:parameter/$${GitHubWebhookSecret}'
                 Action:
                   - 'ssm:GetParameters'
               - Effect: Allow

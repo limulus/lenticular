@@ -27,7 +27,7 @@ yargs
     },
     'build-region': {
       desc: `Region for product's build pipeline`,
-      default: config.buildRegion,
+      demandOption: true,
       group: 'Global Options:',
     },
     'product-dir': {
@@ -51,7 +51,12 @@ yargs
       group: 'Global Options:'
     },
     'github-token-secret': {
-      desc: `Name of the secret used to store your GitHub Oauth token`,
+      desc: `Name of the secret that stores the GitHub Oauth token`,
+      demandOption: true,
+      group: 'Global Options:'
+    },
+    'github-webhook-secret': {
+      desc: `Name of the secret that stores the GitHub Webhook secret`,
       demandOption: true,
       group: 'Global Options:'
     },
@@ -62,7 +67,7 @@ yargs
     },
     'iam-admin-user': {
       desc: `IAM user name that you use to deploy your pipeline`,
-      default: 'admin',
+      demandOption: true,
       group: 'Global Options:'
     },
   })

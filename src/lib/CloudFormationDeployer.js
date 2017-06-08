@@ -20,9 +20,12 @@ export default class CloudFormationDeployer extends Configurable {
     const pipelineYaml = await readFileAsync('./infra/pipeline.yaml', 'utf8')
     const cfYaml = convertLenticularYamlToCloudFormationYaml(pipelineYaml, this.config)
     const opts = {
+      parameters: {
+        GitHubWebhookSecret: this.config.githubWebhookSecret,
+      },
       secretParameters: {
-        GitHubOauthToken: this.config.githubTokenSecret
-      }
+        GitHubOauthToken: this.config.githubTokenSecret,
+      },
     }
     return await this.deploy(`${this.config.productName}-pipeline`, cfYaml, opts)
   }

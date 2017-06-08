@@ -15,6 +15,7 @@ describe(`InitFileWriter`, () => {
     githubRepoName: 'tycho',
     githubRepoBranch: 'master',
     githubTokenSecret: 'github-limulus-token',
+    githubWebhookSecret: 'tycho-github-webhook-secret',
     secretsKeyId: 'jjk3-323434l32j3-3lkjlkj',
     productDir: null
   }
@@ -41,6 +42,7 @@ describe(`InitFileWriter`, () => {
         "githubRepoBranch": 'master',
         "secretsKeyId": 'jjk3-323434l32j3-3lkjlkj',
         "githubTokenSecret": 'github-limulus-token',
+        "githubWebhookSecret": "tycho-github-webhook-secret",
       })
     })
 

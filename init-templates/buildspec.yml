@@ -22,7 +22,8 @@ phases:
 
   install:
     commands:
-      - npm install --global lenticular
+      - npm install --global npm@5.0.3
+      - npm install --global npx
 
   # pre_build:
   #   commands:
@@ -31,7 +32,7 @@ phases:
   build:
     commands:
       - npm install
-      - lenticular generate
+      - npx lenticular generate
 
 
 # -------------------------------------------------------------------

@@ -125,7 +125,7 @@ Resources:
       Handler: index.handler
       Runtime: nodejs6.10
       MemorySize: 128
-      Timeout: 15
+      Timeout: 7
       Role: !GetAtt GitHubWebhookHandlerRole.Arn
       Environment:
         Variables:
@@ -150,6 +150,7 @@ Resources:
             const eventType = event.headers['X-GitHub-Event']
             if (!eventType) {
               const statusCode = 401, body = 'No X-GitHub-Event header on request'
+              return cb(null, { statusCode, body })
             }
 
             const payload = JSON.parse(event.body)

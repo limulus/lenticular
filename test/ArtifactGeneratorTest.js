@@ -1,8 +1,9 @@
 import assert from 'assert'
 import sinon from 'sinon'
 import TmpDir from './util/TempDir.js'
+import {sync as mkdirpSync} from 'mkdirp'
 import {getFixturePath, loadFixtureAsString} from './util/fixtures.js'
-import {readFileSync} from 'fs'
+import {readFileSync, writeFileSync} from 'fs'
 import {resolve as resolvePath} from 'path'
 
 import InitFileWriter from '../src/lib/InitFileWriter.js'
@@ -50,6 +51,30 @@ describe(`ArtifactGenerator`, () => {
         resolvePath(config.productDir, 'infra', 'pipeline.yaml'),
         resolvePath(config.productDir, 'artifacts', 'infra', 'pipeline.yaml')
       ))
+    })
+  })
+
+  describe(`generateLambdaArtifacts()`, () => {
+    beforeEach(() => {
+      const apiHandlerDir = tmpDir.pathForFile('lambdas/apiHandler')
+      mkdirpSync(apiHandlerDir)
+      writeFileSync(
+        resolvePath(apiHandlerDir, 'index.js'),
+        `module.exports.handler = () => {}`
+      )
+      writeFileSync(
+        resolvePath(apiHandlerDir, 'package.json'),
+        JSON.stringify({
+          name: '@example/apiHandler',
+          version: '0.0.1',
+          main: 'index.js',
+        }, undefined, 2)
+      )
+    })
+
+    it('should run `aws cloudformation package`', async () => {
+      async generator.generateLambdaArtifacts()
+
     })
   })
 })

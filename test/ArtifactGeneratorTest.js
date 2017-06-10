@@ -73,7 +73,7 @@ describe(`ArtifactGenerator`, () => {
     })
 
     it('should run `aws cloudformation package`', async () => {
-      async generator.generateLambdaArtifacts()
+      await generator.generateLambdaArtifacts()
 
     })
   })

@@ -32,3 +32,10 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: projectx
+  AnotherBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !<!Join>
+        - '-'
+        - - projectx
+          - foo

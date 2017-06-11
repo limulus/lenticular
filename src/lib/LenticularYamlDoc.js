@@ -46,6 +46,10 @@ function lenticularYamlDataToCloudFormationYamlData (data, config) {
   else if (data instanceof LenticularYamlType) {
     return data.toCloudFormationYamlData(config)
   }
+  else if (instanceOfCFClass(data)) {
+    const convertedData = lenticularYamlDataToCloudFormationYamlData(data.data, config)
+    return new data.constructor(convertedData)
+  }
   else {
     return data
   }
@@ -60,18 +64,18 @@ class ResourceName extends LenticularYamlType {
   }
 
   toCloudFormationYamlData (config) {
-    return new (cfClasses.get('!Join:sequence'))(['-', [
-      new (cfClasses.get('!Ref:scalar'))('AWS::StackName'), this.name
+    return new (cfConstructors.get('!Join:sequence'))(['-', [
+      new (cfConstructors.get('!Ref:scalar'))('AWS::StackName'), this.name
     ]])
   }
 }
 
 class ResourceNameWithRegion extends ResourceName {
   toCloudFormationYamlData (config) {
-    return new (cfClasses.get('!Join:sequence'))(['-', [
-      new (cfClasses.get('!Ref:scalar'))('AWS::StackName'),
+    return new (cfConstructors.get('!Join:sequence'))(['-', [
+      new (cfConstructors.get('!Ref:scalar'))('AWS::StackName'),
       this.name,
-      new (cfClasses.get('!Ref:scalar'))('AWS::Region')
+      new (cfConstructors.get('!Ref:scalar'))('AWS::Region')
     ]])
   }
 }
@@ -125,9 +129,22 @@ const ConfigValueYamlType = new yaml.Type('!Lenticular::ConfigValue', {
   represent: (ref, style) => ref.name
 })
 
-const cfClasses = new Map(
+const cfConstructors = new Map(
   CFTags.map(tag => [`${tag.tag}:${tag.kind}`, tag.construct])
 )
+
+const cfClasses = new Map(
+  CFTags.map(tag => [`${tag.tag}:${tag.kind}`, tag.instanceOf])
+)
+
+function instanceOfCFClass (instance) {
+  for (let cfClass of cfClasses.values()) {
+    if (instance instanceof cfClass) {
+      return true
+    }
+  }
+  return false
+}
 
 export const LENTICULAR_SCHEMA = yaml.Schema.create(CFTags.concat([
   ResourceNameYamlType, ResourceNameWithRegionYamlType, ProductNameYamlType,

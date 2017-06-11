@@ -30,3 +30,8 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Lenticular::ConfigValue productName
+
+  AnotherBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Join ['-', [!<!Lenticular::ProductName>, 'foo']]

@@ -6,6 +6,7 @@ import {getFixturePath, loadFixtureAsString} from './util/fixtures.js'
 import {readFileSync, writeFileSync} from 'fs'
 import {resolve as resolvePath} from 'path'
 import child_process from 'child_process'
+import {EventEmitter} from 'events'
 
 import InitFileWriter from '../src/lib/InitFileWriter.js'
 import ArtifactGenerator from '../src/lib/ArtifactGenerator.js'
@@ -82,13 +83,16 @@ describe(`ArtifactGenerator`, () => {
       childProcessMock.expects('spawn')
         .once()
         .withArgs('aws', [
-          'aws', 'cloudformation', 'package',
-          '--template-file', tmpDir.pathForFile('artifacts/infrastructure.yaml'),
+          'cloudformation', 'package',
+          '--template-file', tmpDir.pathForFile('artifacts/infrastructure-converted.yaml'),
           '--s3-bucket', `${config.productName}-${config.buildRegion}-lambdas`,
-          '--s3-prefix',
+          '--kms-key-id', 'aws/s3',
+          '--output-template-file', tmpDir.pathForFile('artifacts/infrastructure.yaml'),
         ])
+        .returns(new EventEmitter())
 
       await generator.generateLambdaArtifacts()
+
       mock.verify()
     })
   })

@@ -92,8 +92,8 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/nodejs:6.3.1
         EnvironmentVariables:
-          - Name: ARTIFACT_BUCKET
-            Value: !Ref ArtifactBucket
+          - Name: LAMBDA_BUCKET
+            Value: !Ref LambdaBucket
       Name: !Lenticular::ResourceName ArtifactBuilder
       ServiceRole: !Ref ArtifactBuilderRole
       Source:
@@ -101,13 +101,26 @@ Resources:
 
 
 # -------------------------------------------------------------------
-# Resources: S3 Bucket for Artifacts
+# Resources: S3 Bucket for Pipeline Artifacts
 # -------------------------------------------------------------------
 
   ArtifactBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Lenticular::ResourceNameWithRegion artifacts
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: BucketOwnerFullControl
+
+
+# -------------------------------------------------------------------
+# Resources: S3 Bucket for Lambda Function Archives
+# -------------------------------------------------------------------
+
+  LambdaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Join ['-', [!<!Lenticular::ProductName>, !Ref 'AWS::Region', 'lambdas']]
       VersioningConfiguration:
         Status: Enabled
       AccessControl: BucketOwnerFullControl
@@ -307,11 +320,12 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Resource: !Sub '$${ArtifactBucket.Arn}/*'
+                Resource:
+                  - !Sub '$${ArtifactBucket.Arn}/*'
+                  - !Sub '$${LambdaBucket.Arn}/*'
                 Action:
-                  - s3:GetObject
-                  - s3:GetObjectVersion
-                  - s3:PutObject
+                  - 's3:GetObject*'
+                  - 's3:PutObject*'
               - Effect: Allow
                 Resource: !Sub 'arn:aws:logs:$${AWS::Region}:$${AWS::AccountId}:*'
                 Action:

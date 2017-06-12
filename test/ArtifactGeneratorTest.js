@@ -60,8 +60,14 @@ describe(`ArtifactGenerator`, () => {
     })
   })
 
-  describe(`generateLambdaArtifacts()`, () => {
+  describe(`uploadLambdaArtifactsAndTweakSAMTemplate()`, () => {
+    let childProcessMock, fakeAWSChildProcess
+
     beforeEach(() => {
+      childProcessMock = sinon.mock(child_process)
+      fakeAWSChildProcess = new EventEmitter()
+      generator._spawnDepInjection = sinon.stub().returns(fakeAWSChildProcess)
+
       const apiHandlerDir = tmpDir.pathForFile('lambdas/apiHandler')
       mkdirpSync(apiHandlerDir)
       writeFileSync(
@@ -79,21 +85,25 @@ describe(`ArtifactGenerator`, () => {
     })
 
     it('should run `aws cloudformation package`', async () => {
-      const childProcessMock = sinon.mock(child_process)
-      childProcessMock.expects('spawn')
+      const src = tmpDir.pathForFile('artifacts/infrastructure-converted.yaml')
+      const dest = tmpDir.pathForFile('artifacts/infrastructure.yaml')
+
+      setImmediate(() => fakeAWSChildProcess.emit('exit', { code: 0 }))
+
+      generator._spawnDepInjection = childProcessMock.expects('spawn')
         .once()
         .withArgs('aws', [
           'cloudformation', 'package',
-          '--template-file', tmpDir.pathForFile('artifacts/infrastructure-converted.yaml'),
+          '--template-file', src,
           '--s3-bucket', `${config.productName}-${config.buildRegion}-lambdas`,
           '--kms-key-id', 'aws/s3',
-          '--output-template-file', tmpDir.pathForFile('artifacts/infrastructure.yaml'),
+          '--output-template-file', dest,
         ])
-        .returns(new EventEmitter())
+        .returns(fakeAWSChildProcess)
 
-      await generator.generateLambdaArtifacts()
+      await generator.uploadLambdaArtifactsAndTweakSAMTemplate(src, dest)
 
-      mock.verify()
+      childProcessMock.verify()
     })
   })
 })

@@ -3,12 +3,15 @@ import {readFile, writeFile} from 'fs'
 import {resolve as resolvePath, parse as parsePath} from 'path'
 import mkdirp from 'mkdirp'
 import {convertLenticularYamlToCloudFormationYaml} from './LenticularYamlDoc.js'
+import {spawn} from 'child_process'
 
 export default class ArtifactGenerator extends Configurable {
   constructor (config) {
     super(config, {
       extraRequiredProperties: ['productDir']
     })
+
+    this._spawnDepInjection = null
   }
 
   async generatePipelineTemplate () {
@@ -31,6 +34,32 @@ export default class ArtifactGenerator extends Configurable {
           })
         })
       })
+    })
+  }
+
+  async uploadLambdaArtifactsAndTweakSAMTemplate (srcPath, destPath) {
+    return new Promise((resolve, reject) => {
+      const spawn = this._spawnDepInjection || spawn
+      spawn('aws', [
+        'cloudformation', 'package',
+        '--template-file', srcPath,
+        '--s3-bucket', process.env.LAMBDA_BUCKET,
+        '--kms-key-id', 'aws/s3',
+        '--output-template-file', destPath,
+      ], {stdio: 'inherit'})
+        .once('exit', e => {
+          if (e.code === 0) {
+            return resolve(undefined)
+          }
+          else {
+            return reject(
+              new Error(`aws cloudformation package exited with ${e.code}`)
+            )
+          }
+        })
+        .once('error', err => {
+          return reject(err)
+        })
     })
   }
 }

@@ -1,5 +1,4 @@
 import * as lenticular from '../../'
-import sysexits from 'sysexits'
 
 export const command = 'generate'
 export const desc = 'Generate artifacts — CloudFormation templates & Lambda zips'
@@ -18,7 +17,6 @@ export async function handler (argv) {
     await generator.generatePipelineTemplate()
   }
   else {
-    console.error(`Sorry, only pipeline template generation working so far.`)
-    process.exit(sysexits.USAGE)
+    await generator.generateAndUploadArtifacts()
   }
 }

@@ -3,7 +3,7 @@ import {readFile, writeFile} from 'fs'
 import {resolve as resolvePath, parse as parsePath} from 'path'
 import mkdirp from 'mkdirp'
 import {convertLenticularYamlToCloudFormationYaml} from './LenticularYamlDoc.js'
-import {spawn} from 'child_process'
+import child_process from 'child_process'
 
 export default class ArtifactGenerator extends Configurable {
   constructor (config) {
@@ -37,23 +37,34 @@ export default class ArtifactGenerator extends Configurable {
     })
   }
 
+  async generateAndUploadArtifacts () {
+    await this.generateCloudFormationTemplate(
+      resolvePath(this.config.productDir, 'infra', 'index.yaml'),
+      resolvePath(this.config.productDir, 'artifacts', 'index-cf.yaml')
+    )
+    await this.uploadLambdaArtifactsAndTweakSAMTemplate(
+      resolvePath(this.config.productDir, 'artifacts', 'index-cf.yaml'),
+      resolvePath(this.config.productDir, 'artifacts', 'infrastructure.yaml')
+    )
+  }
+
   async uploadLambdaArtifactsAndTweakSAMTemplate (srcPath, destPath) {
     return new Promise((resolve, reject) => {
-      const spawn = this._spawnDepInjection || spawn
+      const spawn = this._spawnDepInjection || child_process.spawn
       spawn('aws', [
         'cloudformation', 'package',
         '--template-file', srcPath,
         '--s3-bucket', process.env.LAMBDA_BUCKET,
-        '--kms-key-id', 'aws/s3',
+        '--kms-key-id', 'alias/aws/s3',
         '--output-template-file', destPath,
       ], {stdio: 'inherit'})
-        .once('exit', e => {
-          if (e.code === 0) {
+        .once('exit', code => {
+          if (code === 0) {
             return resolve(undefined)
           }
           else {
             return reject(
-              new Error(`aws cloudformation package exited with ${e.code}`)
+              new Error(`aws cloudformation package exited with ${code}`)
             )
           }
         })

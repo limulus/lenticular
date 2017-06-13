@@ -88,7 +88,7 @@ describe(`ArtifactGenerator`, () => {
       const src = tmpDir.pathForFile('artifacts/infrastructure-converted.yaml')
       const dest = tmpDir.pathForFile('artifacts/infrastructure.yaml')
 
-      setImmediate(() => fakeAWSChildProcess.emit('exit', { code: 0 }))
+      setImmediate(() => fakeAWSChildProcess.emit('exit', 0))
 
       generator._spawnDepInjection = childProcessMock.expects('spawn')
         .once()
@@ -96,7 +96,7 @@ describe(`ArtifactGenerator`, () => {
           'cloudformation', 'package',
           '--template-file', src,
           '--s3-bucket', `${config.productName}-${config.buildRegion}-lambdas`,
-          '--kms-key-id', 'aws/s3',
+          '--kms-key-id', 'alias/aws/s3',
           '--output-template-file', dest,
         ])
         .returns(fakeAWSChildProcess)

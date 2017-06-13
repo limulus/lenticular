@@ -66,7 +66,7 @@ Resources:
 
         - Name: Deploy
           Actions:
-            - Name: DeployInfrastructure
+            - Name: CreateChangeSet
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -76,11 +76,25 @@ Resources:
                 - Name: ProductArtifacts
               Configuration:
                 StackName: !Lenticular::ProductName
-                ActionMode: CREATE_UPDATE
-                Capabilities: CAPABILITY_IAM
+                ActionMode: CHANGE_SET_REPLACE
+                ChangeSetName: !Lenticular::ResourceName 'change-set'
+                Capabilities: CAPABILITY_NAMED_IAM
                 TemplatePath: ProductArtifacts::infrastructure.yaml
                 RoleArn: !GetAtt CloudFormationRole.Arn
               RunOrder: 1
+            - Name: ExecuteChangeSet
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                StackName: !Lenticular::ProductName
+                ActionMode: CHANGE_SET_EXECUTE
+                Capabilities: CAPABILITY_NAMED_IAM
+                ChangeSetName: !Lenticular::ResourceName 'change-set'
+                RoleArn: !GetAtt CloudFormationRole.Arn
+              RunOrder: 2
 
   ArtifactBuilder:
     Type: AWS::CodeBuild::Project

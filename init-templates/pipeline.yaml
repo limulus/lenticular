@@ -79,7 +79,7 @@ Resources:
                 ActionMode: CREATE_UPDATE
                 Capabilities: CAPABILITY_IAM
                 TemplatePath: ProductArtifacts::infrastructure.yaml
-                RoleArn: CloudFormationRole
+                RoleArn: !GetAtt CloudFormationRole.Arn
               RunOrder: 1
 
   ArtifactBuilder:

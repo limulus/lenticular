@@ -27,7 +27,7 @@ phases:
 
   # pre_build:
   #   commands:
-  #    - aws ssm get-parameters --names "npmrc" --with-decryption > .npmrc
+  #    - npx lenticular secret get npmrc > .npmrc
 
   build:
     commands:

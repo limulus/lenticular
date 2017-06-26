@@ -6,6 +6,5 @@
   "githubRepoName": "${githubRepoName}",
   "githubRepoBranch": "${githubRepoBranch}",
   "githubTokenSecret": "${githubTokenSecret}",
-  "githubWebhookSecret": "${githubWebhookSecret}",
   "secretsKeyId": "${secretsKeyId}"
 }

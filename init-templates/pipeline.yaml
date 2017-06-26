@@ -10,8 +10,6 @@ Parameters:
   GitHubOauthToken:
     Type: String
     NoEcho: true
-  GitHubWebhookSecret:
-    Type: String
 
 
 Resources:
@@ -141,128 +139,6 @@ Resources:
 
 
 # -------------------------------------------------------------------
-# GitHub Webhook Endpoint
-# -------------------------------------------------------------------
-
-  GitHubWebhookHandlerFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      FunctionName: !Lenticular::ResourceName github-webhook-handler
-      Description: Handles GitHub Webhook Requests
-      Handler: index.handler
-      Runtime: nodejs6.10
-      MemorySize: 128
-      Timeout: 7
-      Role: !GetAtt GitHubWebhookHandlerRole.Arn
-      Environment:
-        Variables:
-          GITHUB_WEBHOOK_SECRET: !Ref GitHubWebhookSecret
-          GITHUB_REPO_BRANCH: master     # FIXME
-          PIPELINE_NAME: !Ref Pipeline
-      Code:
-        ZipFile: |
-          const AWS = require('aws-sdk')
-          const createHmac = require('crypto').createHmac
-
-          module.exports.handler = (event, context, cb) => {
-            const githubWebhookSecret = process.env.GITHUB_WEBHOOK_SECRET
-            const branch = process.env.GITHUB_REPO_BRANCH
-
-            const receivedSignature = event.headers['X-Hub-Signature']
-            if (!receivedSignature) {
-              const statusCode = 401, body = 'No X-Hub-Signature header on request'
-              return cb(null, { statusCode, body })
-            }
-
-            const eventType = event.headers['X-GitHub-Event']
-            if (!eventType) {
-              const statusCode = 401, body = 'No X-GitHub-Event header on request'
-              return cb(null, { statusCode, body })
-            }
-
-            const payload = JSON.parse(event.body)
-            console.log(JSON.stringify(payload, undefined, 2))
-
-            if (! eventType.match(/^(push)$/)) {
-              const statusCode = 200, body = ''
-              return cb(null, { statusCode, body })
-            }
-
-            const ssm = new AWS.SSM()
-            const Names = [githubWebhookSecret], WithDecryption = true
-            ssm.getParameters({ Names, WithDecryption }).promise()
-              .then(response => {
-                const secret = response.Parameters[0].Value
-                const expectedSignature = createHmac('sha1', secret)
-                  .update(event.body, 'utf-8')
-                  .digest('hex')
-
-                if (receivedSignature !== `sha1=$${expectedSignature}`) {
-                  console.log(`Expected signature '$${expectedSignature}'`)
-                  const statusCode = 401, body = 'Failed signature validation'
-                  return cb(null, { statusCode, body })
-                }
-
-                if (eventType === 'push' && payload.ref === `refs/heads/$${branch}`) {
-                  const cp = new AWS.CodePipeline()
-                  const name = process.env.PIPELINE_NAME
-                  cp.startPipelineExecution({name}).promise()
-                    .then(response => {
-                      console.log(`Successfully started pipeline execution. $${response.pipelineExecutionId}`)
-                      const statusCode = 200, body = JSON.stringify(response)
-                      return cb(null, { statusCode, body })
-                    })
-                    .catch(err => {
-                      console.log(`Failed to start pipeline execution. $${err.message}`)
-                      const statusCode = 500, body = err.message
-                      return cb(null, { statusCode, body })
-                    })
-                }
-              })
-              .catch(err => {
-                console.log(`ssm.getParameters failed. $${err.message}`)
-                const statusCode = 500, body = err.message
-                return cb(null, { statusCode, body })
-              })
-          }
-
-  GitHubWebhookApiHandlerPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:$${AWS::Region}:$${AWS::AccountId}:*'
-      FunctionName: !GetAtt GitHubWebhookHandlerFunction.Arn
-
-  GitHubWebhookApi:
-    Type: AWS::ApiGateway::RestApi
-    Properties:
-      Name: !Lenticular::ResourceName 'github-webhook'
-
-  GitHubWebhookApiEventResourcePost:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref GitHubWebhookApi
-      ResourceId: !GetAtt GitHubWebhookApi.RootResourceId
-      HttpMethod: POST
-      AuthorizationType: NONE
-      ApiKeyRequired: false
-      Integration:
-        Type: AWS_PROXY
-        PassthroughBehavior: when_no_match
-        Uri: !Sub 'arn:aws:apigateway:$${AWS::Region}:lambda:path/2015-03-31/functions/$${GitHubWebhookHandlerFunction.Arn}/invocations'
-        IntegrationHttpMethod: POST
-
-  GitHubWebhookApiDeployment:
-    Type: AWS::ApiGateway::Deployment
-    Properties:
-      RestApiId: !Ref GitHubWebhookApi
-      StageName: v1
-    DependsOn:
-      - GitHubWebhookApiEventResourcePost
-
-
-# -------------------------------------------------------------------
 # Resources: IAM Roles
 # -------------------------------------------------------------------
 
@@ -360,40 +236,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
 
-  GitHubWebhookHandlerRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Lenticular::ResourceNameWithRegion github-webhook-handler
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          Effect: Allow
-          Action: sts:AssumeRole
-          Principal:
-            Service: lambda.amazonaws.com
-      Policies:
-        - PolicyName: github-webhook-handler
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Resource: !Sub 'arn:aws:codepipeline:$${AWS::Region}:$${AWS::AccountId}:$${Pipeline}'
-                Action:
-                  - 'codepipeline:StartPipelineExecution'
-              - Effect: Allow
-                Resource: !Sub 'arn:aws:ssm:$${AWS::Region}:$${AWS::AccountId}:parameter/$${GitHubWebhookSecret}'
-                Action:
-                  - 'ssm:GetParameters'
-              - Effect: Allow
-                Resource: !ImportValue SecretsKeyArn
-                Action:
-                  - 'kms:Decrypt'
-              - Effect: Allow
-                Resource: !Sub 'arn:aws:logs:$${AWS::Region}:$${AWS::AccountId}:*'
-                Action:
-                  - 'logs:CreateLog*'
-                  - 'logs:PutLog*'
-
 
 # -------------------------------------------------------------------
 # Outputs
@@ -402,5 +244,3 @@ Resources:
 Outputs:
   pipelineId:
     Value: !Ref 'Pipeline'
-  GitHubWebhookUri:
-    Value: !Sub "https://$${GitHubWebhookApi}.execute-api.$${AWS::Region}.amazonaws.com/v1/"

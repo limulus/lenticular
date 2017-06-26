@@ -21,7 +21,6 @@ describe(`ArtifactGenerator`, () => {
     githubRepoBranch: 'master',
     githubTokenSecret: 'github-limulus-token',
     secretsKeyId: 'jjk3-323434l32j3-3lkjlkj',
-    githubWebhookSecret: 'projectx-github-webhook-secret',
     productDir: null
   }
 

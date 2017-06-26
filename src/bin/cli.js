@@ -55,11 +55,6 @@ yargs
       demandOption: true,
       group: 'Global Options:'
     },
-    'github-webhook-secret': {
-      desc: `Name of the secret that stores the GitHub Webhook secret`,
-      demandOption: true,
-      group: 'Global Options:'
-    },
     'secrets-key-id': {
       desc: `KMS Key ID used to encrypt secrets`,
       demandOption: true,

@@ -28,28 +28,28 @@
   "homepage": "https://github.com/limulus/lenticular#readme",
   "dependencies": {
     "aws-cf-monitor": "^1.0.4",
-    "aws-sdk": "^2.67.0",
+    "aws-sdk": "^2.95.0",
     "backtick-template": "^0.1.1",
     "cloudformation-js-yaml-schema": "^0.3.1",
     "fallback-cli": "^2.0.2",
-    "inquirer": "^3.1.0",
-    "isobject": "^3.0.0",
-    "js-yaml": "^3.8.3",
+    "inquirer": "^3.2.1",
+    "isobject": "^3.0.1",
+    "js-yaml": "^3.9.1",
     "lodash.uniq": "^4.5.0",
     "mkdirp": "^0.5.1",
     "parse-github-repo-url": "^1.4.0",
     "rc": "^1.2.1",
     "source-map-support": "^0.4.15",
-    "yargs": "^7.1.0"
+    "yargs": "^8.0.2"
   },
   "devDependencies": {
     "aws-sdk-mock": "^1.7.0",
     "babel-cli": "^6.24.1",
-    "babel-preset-env": "^1.5.2",
+    "babel-preset-env": "^1.6.0",
     "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.24.1",
-    "mocha": "^3.3.0",
+    "mocha": "^3.5.0",
     "rimraf": "^2.6.1",
-    "sinon": "^2.3.4"
+    "sinon": "^3.1.0"
   }
 }

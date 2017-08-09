@@ -2,8 +2,8 @@
 
 import 'source-map-support/register'
 
+import {config} from '..'
 import yargs from 'yargs'
-import rc from 'rc'
 import {basename as pathBasename} from 'path'
 import {readFileSync} from 'fs'
 import parseGitHubUrl from 'parse-github-repo-url'
@@ -13,8 +13,6 @@ if (pkgJson.repository) {
   const repo = pkgJson.repository
   var [githubRepoOwner, githubRepoName] = parseGitHubUrl(repo.url || repo)
 }
-
-const config = rc('lenticular')
 
 yargs
   .commandDir('cmds')

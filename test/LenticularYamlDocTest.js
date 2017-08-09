@@ -1,6 +1,8 @@
 import assert from 'assert'
 import sinon from 'sinon'
 import {loadFixtureAsString} from './util/fixtures.js'
+import yaml from 'js-yaml'
+import {CLOUDFORMATION_SCHEMA} from 'cloudformation-js-yaml-schema'
 
 import LenticularYamlDoc, {convertLenticularYamlToCloudFormationYaml}
   from '../src/lib/LenticularYamlDoc.js'
@@ -52,6 +54,18 @@ describe(`LenticularYamlDoc`, () => {
         doc.toCloudFormationYamlString().trim().replace(/\s+\r?\n/g, '\n'),
         loadFixtureAsString(`lenticular-cf-afterTransform.yaml`).trim()
       )
+    })
+  })
+
+  describe(`toCloudFormationYamlData()`, () => {
+    it(`should return data converted to CloudFormation data`, () => {
+      doc = new LenticularYamlDoc(loadFixtureAsString(`lenticular-cf.yaml`), config)
+      const cfData = doc.toCloudFormationYamlData()
+      const expectedData = yaml.safeLoad(
+        loadFixtureAsString(`lenticular-cf-afterTransform.yaml`),
+        { schema: CLOUDFORMATION_SCHEMA }
+      )
+      assert.deepEqual(cfData, expectedData)
     })
   })
 })

@@ -17,8 +17,13 @@ export default class LenticularYamlDoc extends Configurable {
   }
 
   toCloudFormationYamlString () {
-    const yamlData = lenticularYamlDataToCloudFormationYamlData(this.data, this.config)
-    return yamlDataToString(yamlData, CLOUDFORMATION_SCHEMA)
+    return yamlDataToString(
+      this.toCloudFormationYamlData(), CLOUDFORMATION_SCHEMA
+    )
+  }
+
+  toCloudFormationYamlData () {
+    return lenticularYamlDataToCloudFormationYamlData(this.data, this.config)
   }
 
   toYamlString (schema = LENTICULAR_SCHEMA) {

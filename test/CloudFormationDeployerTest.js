@@ -33,25 +33,12 @@ describe(`CloudFormationDeployer`, () => {
   })
 
   describe(`deploy()`, () => {
-    it(`should call createStack() when stack does not exist`, async () => {
-      aws.stub('CloudFormation', 'describeStacks')
-        .onFirstCall().yieldsAsync(new Error(`Stack with id some-stack does not exist`))
-        .onSecondCall().yieldsAsync(null, defaultDescribeStacksResult)
-
-      const mock = sinon.mock(cfMonitor)
-      mock.expects('createStack').once().resolves({ StackId: 'stack0' })
-
-      await deployer.deploy('some-stack', `TemplateBody`)
-
-      mock.verify()
-    })
-
-    it(`should call updateStack() when stack already exists`, async () => {
+    it(`should call createOrUpdateStack()`, async () => {
       aws.stub('CloudFormation', 'describeStacks')
         .yieldsAsync(null, defaultDescribeStacksResult)
 
       const mock = sinon.mock(cfMonitor)
-      mock.expects('updateStack').once().resolves({ StackId: 'stack0' })
+      mock.expects('createOrUpdateStack').once().resolves({ StackId: 'stack0' })
 
       await deployer.deploy('some-stack', `TemplateBody`)
 
@@ -61,7 +48,7 @@ describe(`CloudFormationDeployer`, () => {
     it(`should call SecretsManager.get() to retreive secret params`, async () => {
       aws.stub('CloudFormation', 'describeStacks')
         .yieldsAsync(null, defaultDescribeStacksResult)
-      const stub = sinon.stub(cfMonitor, 'updateStack').resolves({})
+      const stub = sinon.stub(cfMonitor, 'createOrUpdateStack').resolves({})
 
       const mock = sinon.mock(deployer.secretsManager)
       mock.expects('getSecret').once().withExactArgs('supersecretparam')
@@ -73,7 +60,7 @@ describe(`CloudFormationDeployer`, () => {
     })
 
     it(`should return outputs from stack`, async () => {
-      const updateStackStub = sinon.stub(cfMonitor, 'updateStack')
+      const updateStackStub = sinon.stub(cfMonitor, 'createOrUpdateStack')
         .resolves({})
       const stub = aws.stub('CloudFormation', 'describeStacks')
         .yieldsAsync(null, defaultDescribeStacksResult)

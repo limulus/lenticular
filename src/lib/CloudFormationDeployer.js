@@ -30,19 +30,6 @@ export default class CloudFormationDeployer extends Configurable {
   async deploy (StackName, TemplateBody, opts={}) {
     const cf = new AWS.CloudFormation()
 
-    let updateStack = cfMonitor.updateStack
-    try {
-      await cf.describeStacks({ StackName }).promise()
-    }
-    catch (err) {
-      if (err.message.match(/does not exist/)) {
-        updateStack = cfMonitor.createStack
-      }
-      else {
-        throw err
-      }
-    }
-
     const params = Object.assign({}, opts.parameters || {})
     if (opts.secretParameters) {
       await Promise.all(Object.keys(opts.secretParameters).map(async (param) => {
@@ -54,7 +41,7 @@ export default class CloudFormationDeployer extends Configurable {
       return { ParameterKey: key, ParameterValue: params[key] }
     })
 
-    await updateStack({
+    await cfMonitor.createOrUpdateStack({
       StackName,
       TemplateBody,
       Parameters,

@@ -35,3 +35,8 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Join ['-', [!<!Lenticular::ProductName>, 'foo']]
+
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody: !Lenticular::Require 'require-test.js'

@@ -1,5 +1,7 @@
 import Configurable from './Configurable.js'
 import yaml from 'js-yaml'
+import {readFileSync} from 'fs'
+import {dirname, resolve} from 'path'
 import {
   CLOUDFORMATION_SCHEMA,
   cloudformationTags as CFTags
@@ -13,6 +15,12 @@ export function convertLenticularYamlToCloudFormationYaml (documentString, confi
 export default class LenticularYamlDoc extends Configurable {
   constructor (documentString, config) {
     super(config)
+
+    if (documentString.match(/^\//)) {
+      this.path = documentString
+      documentString = readFileSync(documentString)
+    }
+
     this.data = yaml.safeLoad(documentString, {schema: LENTICULAR_SCHEMA})
   }
 
@@ -23,7 +31,8 @@ export default class LenticularYamlDoc extends Configurable {
   }
 
   toCloudFormationYamlData () {
-    return lenticularYamlDataToCloudFormationYamlData(this.data, this.config)
+    const context = {config: this.config, path: this.path}
+    return lenticularYamlDataToCloudFormationYamlData(this.data, context)
   }
 
   toYamlString (schema = LENTICULAR_SCHEMA) {
@@ -37,22 +46,24 @@ function yamlDataToString (data, schema) {
 }
 
 
-function lenticularYamlDataToCloudFormationYamlData (data, config) {
+function lenticularYamlDataToCloudFormationYamlData (data, context) {
+  const {config} = context
+
   if (data !== null && data.constructor === Object) {
     const copy = {}
     Object.keys(data).forEach(key => {
-      copy[key] = lenticularYamlDataToCloudFormationYamlData(data[key], config)
+      copy[key] = lenticularYamlDataToCloudFormationYamlData(data[key], context)
     })
     return copy
   }
   else if (Array.isArray(data)) {
-    return data.map(val => lenticularYamlDataToCloudFormationYamlData(val, config))
+    return data.map(val => lenticularYamlDataToCloudFormationYamlData(val, context))
   }
   else if (data instanceof LenticularYamlType) {
-    return data.toCloudFormationYamlData(config)
+    return data.toCloudFormationYamlData(context)
   }
   else if (instanceOfCFClass(data)) {
-    const convertedData = lenticularYamlDataToCloudFormationYamlData(data.data, config)
+    const convertedData = lenticularYamlDataToCloudFormationYamlData(data.data, context)
     return new data.constructor(convertedData)
   }
   else {
@@ -68,7 +79,7 @@ class ResourceName extends LenticularYamlType {
     this.name = name
   }
 
-  toCloudFormationYamlData (config) {
+  toCloudFormationYamlData () {
     return new (cfConstructors.get('!Join:sequence'))(['-', [
       new (cfConstructors.get('!Ref:scalar'))('AWS::StackName'), this.name
     ]])
@@ -76,7 +87,7 @@ class ResourceName extends LenticularYamlType {
 }
 
 class ResourceNameWithRegion extends ResourceName {
-  toCloudFormationYamlData (config) {
+  toCloudFormationYamlData () {
     return new (cfConstructors.get('!Join:sequence'))(['-', [
       new (cfConstructors.get('!Ref:scalar'))('AWS::StackName'),
       this.name,
@@ -86,7 +97,7 @@ class ResourceNameWithRegion extends ResourceName {
 }
 
 class ProductName extends LenticularYamlType {
-  toCloudFormationYamlData (config) {
+  toCloudFormationYamlData ({config}) {
     return config.productName
   }
 }
@@ -97,11 +108,25 @@ class ConfigValue extends LenticularYamlType {
     this.key = key
   }
 
-  toCloudFormationYamlData (config) {
+  toCloudFormationYamlData ({config}) {
     if (config[this.key] === undefined) {
       throw new Error(`Expected ${this.key} to be present in config object`)
     }
     return config[this.key] + ''
+  }
+}
+
+class Require extends LenticularYamlType {
+  constructor (jsFileRelativePath) {
+    super()
+    this.jsFileRelativePath = jsFileRelativePath
+  }
+
+  toCloudFormationYamlData ({path}) {
+    if (!path) {
+      throw new Error(`Lenticular yaml document must be loaded from a path when using Require`)
+    }
+    return require(resolve(dirname(path), this.jsFileRelativePath))()
   }
 }
 
@@ -134,6 +159,13 @@ const ConfigValueYamlType = new yaml.Type('!Lenticular::ConfigValue', {
   represent: (ref, style) => ref.name
 })
 
+const RequireYamlType = new yaml.Type('!Lenticular::Require', {
+  kind: 'scalar',
+  instanceOf: Require,
+  construct: data => new Require(data),
+  represent: (ref, style) => ref.name
+})
+
 const cfConstructors = new Map(
   CFTags.map(tag => [`${tag.tag}:${tag.kind}`, tag.construct])
 )
@@ -153,5 +185,5 @@ function instanceOfCFClass (instance) {
 
 export const LENTICULAR_SCHEMA = yaml.Schema.create(CFTags.concat([
   ResourceNameYamlType, ResourceNameWithRegionYamlType, ProductNameYamlType,
-  ConfigValueYamlType
+  ConfigValueYamlType, RequireYamlType
 ]))

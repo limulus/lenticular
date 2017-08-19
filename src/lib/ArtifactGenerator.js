@@ -23,15 +23,12 @@ export default class ArtifactGenerator extends Configurable {
 
   async generateCloudFormationTemplate (srcPath, destPath) {
     return new Promise((resolve, reject) => {
-      readFile(srcPath, 'utf8', (err, inYaml) => {
+      const outYaml = convertLenticularYamlToCloudFormationYaml(srcPath, this.config)
+      mkdirp(parsePath(destPath).dir, err => {
         if (err) return reject(err)
-        const outYaml = convertLenticularYamlToCloudFormationYaml(inYaml, this.config)
-        mkdirp(parsePath(destPath).dir, err => {
+        writeFile(destPath, outYaml, err => {
           if (err) return reject(err)
-          writeFile(destPath, outYaml, err => {
-            if (err) return reject(err)
-            return resolve()
-          })
+          return resolve()
         })
       })
     })

@@ -3,7 +3,7 @@
   "version": "0.1.1",
   "description": "A particular CloudFormation helper",
   "main": "dist/index.js",
-  "bin": "dist/bin/cli-shim.js",
+  "bin": "dist/bin/cli-fallback.js",
   "engines": {
     "node": ">=6.0.0"
   },
